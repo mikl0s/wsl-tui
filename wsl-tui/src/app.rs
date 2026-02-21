@@ -3,49 +3,183 @@
 //! [`App`] is the central state struct driving the event loop.  It is passed
 //! to [`crate::ui::render`] for rendering and mutated by the event handler in
 //! `main.rs`.
+//!
+//! This module also defines the [`View`], [`FocusPanel`], and [`ModalState`]
+//! enums that control which UI panel and modal are currently active.
 
-use wsl_core::Config;
+use ratatui::widgets::ListState;
+use wsl_core::{Config, DistroInfo, WslExecutor};
+
+// ── View ──────────────────────────────────────────────────────────────────────
+
+/// The top-level view currently shown in the main content area.
+///
+/// Number keys 1–5 switch between views. Only [`View::Dashboard`] is fully
+/// implemented in Phase 2; the others render a placeholder.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum View {
+    /// Primary distro management view (Phase 2).
+    Dashboard,
+    /// Pack provisioning view (Phase 3 placeholder).
+    Provision,
+    /// Resource monitor view (Phase 4 placeholder).
+    Monitor,
+    /// Backup/snapshot view (Phase 4 placeholder).
+    Backup,
+    /// Log viewer (Phase 4 placeholder).
+    Logs,
+}
+
+impl View {
+    /// Human-readable name shown in the status bar and placeholder screens.
+    #[allow(dead_code)]
+    pub fn display_name(self) -> &'static str {
+        match self {
+            View::Dashboard => "Dashboard",
+            View::Provision => "Provision",
+            View::Monitor => "Monitor",
+            View::Backup => "Backup",
+            View::Logs => "Logs",
+        }
+    }
+}
+
+// ── FocusPanel ────────────────────────────────────────────────────────────────
+
+/// Which panel within the dashboard currently has keyboard focus.
+///
+/// Tab cycles between [`FocusPanel::DistroList`] and [`FocusPanel::Details`].
+/// The focused panel receives a highlighted border.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FocusPanel {
+    /// The distro list on the left side of the dashboard split-pane.
+    DistroList,
+    /// The detail panel on the right side of the dashboard split-pane.
+    Details,
+}
+
+// ── ModalState ────────────────────────────────────────────────────────────────
+
+/// The currently active modal dialog, if any.
+///
+/// [`ModalState::None`] means no modal is visible. The event loop routes key
+/// events to modal-specific handlers when a modal is active.
+#[derive(Debug, Clone, PartialEq)]
+pub enum ModalState {
+    /// No modal is visible — normal event routing applies.
+    None,
+    /// A yes/no confirmation dialog for a destructive action.
+    Confirm {
+        /// Name of the distro the action targets.
+        distro_name: String,
+        /// Human-readable description of the action (e.g., "Remove distro?").
+        action_label: String,
+    },
+    /// The help overlay is visible.
+    Help,
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
 
 /// Central application state.
 ///
-/// Owns the flags that control the event loop and UI rendering.  Created once
+/// Owns all flags that control the event loop and UI rendering.  Created once
 /// at startup from the loaded [`Config`] and lives for the duration of the run.
 pub struct App {
     /// Whether the event loop should keep running.
     ///
-    /// Set to `false` by [`App::quit`].  The loop in `run_app` exits on the
+    /// Set to `false` by [`App::quit`]. The loop in `run_app` exits on the
     /// next iteration.
     pub running: bool,
 
     /// Whether this is the first time the user has launched the application.
     ///
-    /// Derived from `Config::first_run`; `true` when no `config.toml` existed
-    /// before this run.
-    ///
-    /// Phase 1: stored for completeness; used by Phase 2 status bar and
-    /// analytics.  Suppressing the dead_code lint so it does not appear in
-    /// `-D warnings` CI runs before Phase 2 adds a consumer.
+    /// Derived from `Config::first_run`; consumed by the status bar (Task 2).
     #[allow(dead_code)]
     pub first_run: bool,
 
     /// Whether to show the welcome screen.
     ///
-    /// Initially `true` iff `first_run` is `true`.  Pressing any key while the
+    /// Initially `true` iff `first_run` is `true`. Pressing any key while the
     /// welcome screen is visible calls [`App::dismiss_welcome`] which sets this
-    /// to `false`, showing the main placeholder UI.
+    /// to `false`, showing the dashboard.
     pub show_welcome: bool,
+
+    // ── View management ───────────────────────────────────────────────────────
+    /// The currently active top-level view.
+    pub current_view: View,
+
+    /// Which panel has keyboard focus in the dashboard split-pane.
+    pub focus: FocusPanel,
+
+    /// Currently active modal dialog, or [`ModalState::None`].
+    pub modal: ModalState,
+
+    // ── Distro data ───────────────────────────────────────────────────────────
+    /// All installed distros, refreshed every 5 seconds.
+    pub distros: Vec<DistroInfo>,
+
+    /// Ratatui list selection state (scroll offset + highlighted row).
+    pub list_state: ListState,
+
+    /// The name of the selected distro; survives filter changes.
+    ///
+    /// Used to reconcile the selection when the visible list changes (e.g.,
+    /// after a refresh or filter text change).
+    pub selected_name: Option<String>,
+
+    // ── Filter ────────────────────────────────────────────────────────────────
+    /// Whether the filter bar is currently open.
+    pub filter_active: bool,
+
+    /// Current filter text (case-insensitive substring match on distro name).
+    pub filter_text: String,
+
+    // ── Executor ─────────────────────────────────────────────────────────────
+    /// WSL command executor.  Stateless and `Clone` — safe to move into
+    /// `spawn_blocking` closures for long-running wsl.exe calls.
+    pub executor: WslExecutor,
+
+    // ── Status info ───────────────────────────────────────────────────────────
+    /// Name of the active storage backend, shown in the status bar (Task 2).
+    ///
+    /// Set by the caller that opens the storage backend; defaults to
+    /// `"unknown"` until set.
+    #[allow(dead_code)]
+    pub storage_backend: String,
 }
 
 impl App {
     /// Create a new `App` from the loaded configuration.
     ///
-    /// Sets `running = true`, `first_run` from `config.first_run`, and
-    /// `show_welcome = config.first_run`.
+    /// Initialises all fields to safe defaults.  Distros start empty and are
+    /// populated by the first `refresh_distros` call in `run_app`.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use wsl_core::Config;
+    /// use wsl_tui::app::App;
+    ///
+    /// let config = Config::default();
+    /// let app = App::new(&config);
+    /// assert!(app.running);
+    /// ```
     pub fn new(config: &Config) -> Self {
         Self {
             running: true,
             first_run: config.first_run,
             show_welcome: config.first_run,
+            current_view: View::Dashboard,
+            focus: FocusPanel::DistroList,
+            modal: ModalState::None,
+            distros: Vec::new(),
+            list_state: ListState::default().with_selected(Some(0)),
+            selected_name: None,
+            filter_active: false,
+            filter_text: String::new(),
+            executor: WslExecutor::new(),
+            storage_backend: "unknown".to_string(),
         }
     }
 
@@ -57,16 +191,160 @@ impl App {
     /// Dismiss the welcome screen.
     ///
     /// Called when the user presses any key while the welcome screen is
-    /// visible.  After this call, `show_welcome` is `false` and subsequent
-    /// renders show the main placeholder UI.
+    /// visible. After this call, `show_welcome` is `false` and subsequent
+    /// renders show the dashboard.
     pub fn dismiss_welcome(&mut self) {
         self.show_welcome = false;
     }
+
+    /// Reload the distro list from `wsl.exe --list --verbose`.
+    ///
+    /// Updates `self.distros`, clamps the list-state selection to the visible
+    /// range, and reconciles `selected_name` with the (potentially filtered)
+    /// visible list.
+    ///
+    /// Errors from `wsl.exe` are propagated; the caller should decide whether
+    /// to log and continue or surface to the user.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use wsl_core::Config;
+    /// use wsl_tui::app::App;
+    ///
+    /// let config = Config::default();
+    /// let mut app = App::new(&config);
+    /// // In production: app.refresh_distros().unwrap();
+    /// ```
+    pub fn refresh_distros(&mut self) -> anyhow::Result<()> {
+        self.distros = self.executor.list_distros()?;
+        self.clamp_selection();
+        Ok(())
+    }
+
+    /// Return a filtered view of `self.distros`.
+    ///
+    /// When `filter_active` is `false` or `filter_text` is empty, all distros
+    /// are returned.  Otherwise, only distros whose name contains the filter
+    /// text (case-insensitive) are returned.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use wsl_core::Config;
+    /// use wsl_tui::app::App;
+    ///
+    /// let config = Config::default();
+    /// let mut app = App::new(&config);
+    /// // All visible when filter is empty:
+    /// assert_eq!(app.visible_distros().len(), app.distros.len());
+    /// ```
+    pub fn visible_distros(&self) -> Vec<&DistroInfo> {
+        if !self.filter_active || self.filter_text.is_empty() {
+            return self.distros.iter().collect();
+        }
+        let lower = self.filter_text.to_lowercase();
+        self.distros
+            .iter()
+            .filter(|d| d.name.to_lowercase().contains(&lower))
+            .collect()
+    }
+
+    /// Return the distro at the currently selected index in the visible list.
+    ///
+    /// Returns `None` when the visible list is empty or the selection index is
+    /// out of range.
+    pub fn selected_distro(&self) -> Option<&DistroInfo> {
+        let idx = self.list_state.selected()?;
+        self.visible_distros().into_iter().nth(idx)
+    }
+
+    /// Move the selection one row upward, clamping at index 0.
+    pub fn move_selection_up(&mut self) {
+        let current = self.list_state.selected().unwrap_or(0);
+        let new_idx = current.saturating_sub(1);
+        self.list_state.select(Some(new_idx));
+        self.sync_selected_name();
+    }
+
+    /// Move the selection one row downward, clamping at the last visible row.
+    pub fn move_selection_down(&mut self) {
+        let count = self.visible_distros().len();
+        if count == 0 {
+            return;
+        }
+        let current = self.list_state.selected().unwrap_or(0);
+        let new_idx = (current + 1).min(count - 1);
+        self.list_state.select(Some(new_idx));
+        self.sync_selected_name();
+    }
+
+    /// Toggle focus between [`FocusPanel::DistroList`] and [`FocusPanel::Details`].
+    pub fn switch_focus(&mut self) {
+        self.focus = match self.focus {
+            FocusPanel::DistroList => FocusPanel::Details,
+            FocusPanel::Details => FocusPanel::DistroList,
+        };
+    }
+
+    /// Switch the current view.
+    pub fn set_view(&mut self, view: View) {
+        self.current_view = view;
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    /// Clamp the list-state selection to the current visible list length and
+    /// sync `selected_name`.
+    fn clamp_selection(&mut self) {
+        let count = self.visible_distros().len();
+        if count == 0 {
+            self.list_state.select(None);
+            self.selected_name = None;
+            return;
+        }
+
+        // If we had a named selection, try to restore it.
+        if let Some(ref name) = self.selected_name.clone() {
+            let pos = self
+                .visible_distros()
+                .iter()
+                .position(|d| &d.name == name);
+            if let Some(idx) = pos {
+                self.list_state.select(Some(idx));
+                return;
+            }
+        }
+
+        // Otherwise clamp the index.
+        let current = self.list_state.selected().unwrap_or(0);
+        let clamped = current.min(count - 1);
+        self.list_state.select(Some(clamped));
+        self.sync_selected_name();
+    }
+
+    /// Update `selected_name` from the current list-state index.
+    fn sync_selected_name(&mut self) {
+        self.selected_name = self
+            .selected_distro()
+            .map(|d| d.name.clone());
+    }
+}
+
+// ── Public helpers for tests ──────────────────────────────────────────────────
+
+/// Return the `DistroState` for the given name from a slice of [`DistroInfo`].
+///
+/// Used in tests to check state without indexing by position.
+#[cfg(test)]
+fn find_distro<'a>(distros: &'a [DistroInfo], name: &str) -> Option<&'a DistroInfo> {
+    distros.iter().find(|d| d.name == name)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use wsl_core::DistroState;
 
     /// Build a minimal Config with the given `first_run` value.
     fn make_config(first_run: bool) -> Config {
@@ -78,6 +356,22 @@ mod tests {
         }
     }
 
+    /// Create a sample DistroInfo for use in tests.
+    fn make_distro(name: &str, running: bool, is_default: bool) -> DistroInfo {
+        DistroInfo {
+            name: name.to_string(),
+            state: if running {
+                DistroState::Running
+            } else {
+                DistroState::Stopped
+            },
+            version: 2,
+            is_default,
+        }
+    }
+
+    // ── App::new ──────────────────────────────────────────────────────────────
+
     #[test]
     fn test_app_new_first_run() {
         let config = make_config(true);
@@ -86,6 +380,12 @@ mod tests {
         assert!(app.running, "app should start running");
         assert!(app.first_run, "first_run should be true");
         assert!(app.show_welcome, "welcome screen should show on first run");
+        assert_eq!(app.current_view, View::Dashboard);
+        assert_eq!(app.focus, FocusPanel::DistroList);
+        assert_eq!(app.modal, ModalState::None);
+        assert!(app.distros.is_empty());
+        assert!(!app.filter_active);
+        assert!(app.filter_text.is_empty());
     }
 
     #[test]
@@ -97,6 +397,8 @@ mod tests {
         assert!(!app.first_run, "first_run should be false");
         assert!(!app.show_welcome, "welcome screen should not show on subsequent runs");
     }
+
+    // ── App::quit / dismiss_welcome ───────────────────────────────────────────
 
     #[test]
     fn test_app_quit() {
@@ -136,5 +438,174 @@ mod tests {
         app.quit();
         // Quitting shouldn't touch show_welcome.
         assert!(app.show_welcome, "quit should not change show_welcome");
+    }
+
+    // ── visible_distros ───────────────────────────────────────────────────────
+
+    #[test]
+    fn test_app_visible_distros_no_filter() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+        app.distros = vec![
+            make_distro("Ubuntu", true, true),
+            make_distro("Debian", false, false),
+        ];
+
+        let visible = app.visible_distros();
+        assert_eq!(visible.len(), 2, "all distros visible when filter is empty");
+    }
+
+    #[test]
+    fn test_app_visible_distros_with_filter() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+        app.distros = vec![
+            make_distro("Ubuntu", true, true),
+            make_distro("Debian", false, false),
+            make_distro("Ubuntu-22.04", false, false),
+        ];
+        app.filter_active = true;
+        app.filter_text = "ubuntu".to_string();
+
+        let visible = app.visible_distros();
+        assert_eq!(visible.len(), 2, "only ubuntu-matching distros should be visible");
+        assert_eq!(visible[0].name, "Ubuntu");
+        assert_eq!(visible[1].name, "Ubuntu-22.04");
+    }
+
+    #[test]
+    fn test_app_visible_distros_filter_inactive() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+        app.distros = vec![
+            make_distro("Ubuntu", true, true),
+            make_distro("Debian", false, false),
+        ];
+        // filter_text set but not active
+        app.filter_active = false;
+        app.filter_text = "ubuntu".to_string();
+
+        let visible = app.visible_distros();
+        assert_eq!(visible.len(), 2, "all distros visible when filter is not active");
+    }
+
+    // ── selected_distro ───────────────────────────────────────────────────────
+
+    #[test]
+    fn test_app_selected_distro_empty() {
+        let config = make_config(false);
+        let app = App::new(&config);
+        // No distros — selection should return None.
+        assert!(app.selected_distro().is_none());
+    }
+
+    #[test]
+    fn test_app_selected_distro_returns_correct() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+        app.distros = vec![
+            make_distro("Ubuntu", true, true),
+            make_distro("Debian", false, false),
+        ];
+        // list_state is initialised with selected(Some(0))
+        let selected = app.selected_distro();
+        assert!(selected.is_some());
+        assert_eq!(selected.expect("should have selected distro").name, "Ubuntu");
+    }
+
+    // ── move_selection_up / move_selection_down ───────────────────────────────
+
+    #[test]
+    fn test_app_move_selection_down() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+        app.distros = vec![
+            make_distro("Ubuntu", true, true),
+            make_distro("Debian", false, false),
+        ];
+        // Start at index 0.
+        assert_eq!(app.list_state.selected(), Some(0));
+        app.move_selection_down();
+        assert_eq!(app.list_state.selected(), Some(1), "selection should advance");
+    }
+
+    #[test]
+    fn test_app_move_selection_clamps_bottom() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+        app.distros = vec![
+            make_distro("Ubuntu", true, true),
+            make_distro("Debian", false, false),
+        ];
+        // Move past the end.
+        app.move_selection_down();
+        app.move_selection_down();
+        app.move_selection_down();
+        assert_eq!(
+            app.list_state.selected(),
+            Some(1),
+            "selection should clamp at last index"
+        );
+    }
+
+    #[test]
+    fn test_app_move_selection_up_clamps() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+        app.distros = vec![
+            make_distro("Ubuntu", true, true),
+            make_distro("Debian", false, false),
+        ];
+        // Already at 0 — moving up should stay at 0.
+        app.move_selection_up();
+        assert_eq!(
+            app.list_state.selected(),
+            Some(0),
+            "selection should clamp at index 0"
+        );
+    }
+
+    // ── switch_focus ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn test_app_switch_focus() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+
+        assert_eq!(app.focus, FocusPanel::DistroList, "default focus is DistroList");
+        app.switch_focus();
+        assert_eq!(app.focus, FocusPanel::Details, "after Tab focus should be Details");
+        app.switch_focus();
+        assert_eq!(app.focus, FocusPanel::DistroList, "after Tab again focus should return to DistroList");
+    }
+
+    // ── set_view ──────────────────────────────────────────────────────────────
+
+    #[test]
+    fn test_app_set_view() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+
+        assert_eq!(app.current_view, View::Dashboard);
+        app.set_view(View::Provision);
+        assert_eq!(app.current_view, View::Provision);
+        app.set_view(View::Logs);
+        assert_eq!(app.current_view, View::Logs);
+    }
+
+    // ── find_distro helper ────────────────────────────────────────────────────
+
+    #[test]
+    fn test_find_distro_helper() {
+        let distros = vec![
+            make_distro("Ubuntu", true, true),
+            make_distro("Debian", false, false),
+        ];
+        let found = find_distro(&distros, "Debian");
+        assert!(found.is_some());
+        assert_eq!(found.expect("should find Debian").name, "Debian");
+
+        let not_found = find_distro(&distros, "Alpine");
+        assert!(not_found.is_none());
     }
 }
