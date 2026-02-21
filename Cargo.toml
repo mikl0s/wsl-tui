@@ -25,6 +25,7 @@ libsql = { version = "0.9", default-features = false, features = ["core"] }
 futures = "0.3"
 async-trait = "0.1"
 tempfile = "3"
+chrono = "0.4"
 wsl-core = { path = "wsl-core" }
 
 [profile.release]

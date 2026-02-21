@@ -3,41 +3,61 @@
 //! The [`render`] function is the single entry point called from the event
 //! loop on every frame.  It dispatches to sub-renderers based on application
 //! state.
+//!
+//! # Module structure
+//!
+//! - [`welcome`] — first-run welcome screen
+//! - [`dashboard`] — primary distro-management split-pane view
+//! - [`status_bar`] — status bar rendered at the bottom of the dashboard
 
+pub mod dashboard;
+pub mod status_bar;
 pub mod welcome;
 
 use ratatui::{
     Frame,
     layout::Alignment,
-    style::{Color, Style},
+    style::{Modifier, Style},
     widgets::Paragraph,
 };
 
-use crate::app::App;
+use crate::app::{App, View};
+use crate::theme;
 
 /// Render the current application state into `frame`.
 ///
+/// Dispatch logic:
 /// - If `app.show_welcome` is `true`, shows the first-run welcome screen.
-/// - Otherwise shows a placeholder main screen with a quit hint.
-pub fn render(app: &App, frame: &mut Frame) {
+/// - Otherwise dispatches to the view-specific renderer based on `app.current_view`.
+pub fn render(app: &mut App, frame: &mut Frame) {
     if app.show_welcome {
         welcome::render_welcome(frame);
     } else {
-        render_placeholder(frame);
+        match app.current_view {
+            View::Dashboard => dashboard::render_dashboard(app, frame),
+            _ => render_view_placeholder(app, frame),
+        }
     }
 }
 
-/// Render the placeholder main screen.
+/// Render a placeholder for views not yet implemented (Phase 3+).
 ///
-/// Phase 1 stub — replaced with the full distro list UI in Phase 2.
-fn render_placeholder(frame: &mut Frame) {
+/// Shows the view name and a "not yet implemented" message centred on screen.
+fn render_view_placeholder(app: &mut App, frame: &mut Frame) {
     let area = frame.area();
+    let view_name = app.current_view.display_name();
 
-    let text = Paragraph::new("WSL TUI v0.1.0 — Press q to quit")
+    let text = format!("{view_name} — not yet implemented (use number keys 1–5 to switch views)");
+
+    let paragraph = Paragraph::new(text)
         .alignment(Alignment::Center)
-        .style(Style::default().fg(Color::White));
+        .style(
+            Style::default()
+                .fg(theme::SUBTEXT0)
+                .add_modifier(Modifier::ITALIC),
+        );
 
-    // Center vertically by placing the text in the middle row.
+    // Centre vertically.
     let vertical_mid = area.height / 2;
     let centered = ratatui::layout::Rect {
         x: area.x,
@@ -46,5 +66,5 @@ fn render_placeholder(frame: &mut Frame) {
         height: 1,
     };
 
-    frame.render_widget(text, centered);
+    frame.render_widget(paragraph, centered);
 }
