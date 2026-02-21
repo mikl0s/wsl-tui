@@ -9,8 +9,14 @@
 //! - [`welcome`] — first-run welcome screen
 //! - [`dashboard`] — primary distro-management split-pane view
 //! - [`status_bar`] — status bar rendered at the bottom of the dashboard
+//! - [`help_overlay`] — context-aware help overlay (shown on top of dashboard)
+//! - [`confirm_modal`] — y/N confirmation modal for destructive actions
+//! - [`popup`] — shared popup area helper
 
+pub mod confirm_modal;
 pub mod dashboard;
+pub mod help_overlay;
+pub mod popup;
 pub mod status_bar;
 pub mod welcome;
 
@@ -21,7 +27,7 @@ use ratatui::{
     widgets::Paragraph,
 };
 
-use crate::app::{App, View};
+use crate::app::{App, ModalState, View};
 use crate::theme;
 
 /// Render the current application state into `frame`.
@@ -29,6 +35,7 @@ use crate::theme;
 /// Dispatch logic:
 /// - If `app.show_welcome` is `true`, shows the first-run welcome screen.
 /// - Otherwise dispatches to the view-specific renderer based on `app.current_view`.
+/// - After the main view, overlays any active modal on top (help, confirm).
 pub fn render(app: &mut App, frame: &mut Frame) {
     if app.show_welcome {
         welcome::render_welcome(frame);
@@ -36,6 +43,21 @@ pub fn render(app: &mut App, frame: &mut Frame) {
         match app.current_view {
             View::Dashboard => dashboard::render_dashboard(app, frame),
             _ => render_view_placeholder(app, frame),
+        }
+
+        // Render modals on top of the current view.
+        // Order: modals are always rendered last so they appear above everything else.
+        match &app.modal.clone() {
+            ModalState::Help => {
+                help_overlay::render_help(app, frame);
+            }
+            ModalState::Confirm {
+                distro_name,
+                action_label,
+            } => {
+                confirm_modal::render_confirm(frame, distro_name, action_label);
+            }
+            ModalState::None => {}
         }
     }
 }

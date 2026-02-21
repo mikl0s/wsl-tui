@@ -279,6 +279,97 @@ impl App {
         self.sync_selected_name();
     }
 
+    // ── Filter helpers ────────────────────────────────────────────────────────
+
+    /// Activate the filter bar.
+    ///
+    /// Sets `filter_active = true`. The event handler will route subsequent
+    /// character keys to [`App::filter_push_char`] until the filter is
+    /// deactivated.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use wsl_core::Config;
+    /// use wsl_tui::app::App;
+    ///
+    /// let config = Config::default();
+    /// let mut app = App::new(&config);
+    /// app.activate_filter();
+    /// assert!(app.filter_active);
+    /// ```
+    pub fn activate_filter(&mut self) {
+        self.filter_active = true;
+    }
+
+    /// Deactivate the filter bar and clear any accumulated filter text.
+    ///
+    /// Resets `filter_active = false`, clears `filter_text`, and resets the
+    /// list selection to index 0 so the user returns to a predictable position.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use wsl_core::Config;
+    /// use wsl_tui::app::App;
+    ///
+    /// let config = Config::default();
+    /// let mut app = App::new(&config);
+    /// app.activate_filter();
+    /// app.filter_text = "ubu".to_string();
+    /// app.deactivate_filter();
+    /// assert!(!app.filter_active);
+    /// assert!(app.filter_text.is_empty());
+    /// ```
+    pub fn deactivate_filter(&mut self) {
+        self.filter_active = false;
+        self.filter_text.clear();
+        self.list_state.select(Some(0));
+    }
+
+    /// Append a character to the filter text and reset the selection to index 0.
+    ///
+    /// Called for each character key while the filter is active.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use wsl_core::Config;
+    /// use wsl_tui::app::App;
+    ///
+    /// let config = Config::default();
+    /// let mut app = App::new(&config);
+    /// app.activate_filter();
+    /// app.filter_push_char('u');
+    /// app.filter_push_char('b');
+    /// assert_eq!(app.filter_text, "ub");
+    /// ```
+    pub fn filter_push_char(&mut self, c: char) {
+        self.filter_text.push(c);
+        self.list_state.select(Some(0));
+    }
+
+    /// Remove the last character from the filter text.
+    ///
+    /// If the filter text is already empty, this is a no-op.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use wsl_core::Config;
+    /// use wsl_tui::app::App;
+    ///
+    /// let config = Config::default();
+    /// let mut app = App::new(&config);
+    /// app.activate_filter();
+    /// app.filter_push_char('u');
+    /// app.filter_pop_char();
+    /// assert!(app.filter_text.is_empty());
+    /// ```
+    pub fn filter_pop_char(&mut self) {
+        self.filter_text.pop();
+    }
+
     /// Toggle focus between [`FocusPanel::DistroList`] and [`FocusPanel::Details`].
     pub fn switch_focus(&mut self) {
         self.focus = match self.focus {
@@ -591,6 +682,85 @@ mod tests {
         assert_eq!(app.current_view, View::Provision);
         app.set_view(View::Logs);
         assert_eq!(app.current_view, View::Logs);
+    }
+
+    // ── activate_filter / deactivate_filter ───────────────────────────────────
+
+    #[test]
+    fn test_activate_filter() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+
+        assert!(!app.filter_active, "filter should start inactive");
+        app.activate_filter();
+        assert!(app.filter_active, "filter_active should be true after activate_filter()");
+    }
+
+    #[test]
+    fn test_filter_push_and_pop() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+
+        app.activate_filter();
+        app.filter_push_char('u');
+        app.filter_push_char('b');
+        app.filter_push_char('u');
+        assert_eq!(app.filter_text, "ubu", "characters should accumulate");
+
+        app.filter_pop_char();
+        assert_eq!(app.filter_text, "ub", "pop should remove last char");
+
+        app.filter_pop_char();
+        app.filter_pop_char();
+        assert!(app.filter_text.is_empty(), "text should be empty after all pops");
+    }
+
+    #[test]
+    fn test_filter_pop_empty_is_noop() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+
+        // Pop on empty filter should not panic.
+        app.activate_filter();
+        app.filter_pop_char();
+        assert!(app.filter_text.is_empty());
+    }
+
+    #[test]
+    fn test_deactivate_filter_clears() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+
+        app.activate_filter();
+        app.filter_push_char('u');
+        app.filter_push_char('b');
+        assert_eq!(app.filter_text, "ub");
+
+        app.deactivate_filter();
+        assert!(!app.filter_active, "filter_active should be false after deactivate_filter()");
+        assert!(app.filter_text.is_empty(), "filter_text should be cleared after deactivate_filter()");
+    }
+
+    #[test]
+    fn test_deactivate_filter_resets_selection() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+        app.distros = vec![
+            make_distro("Ubuntu", true, true),
+            make_distro("Debian", false, false),
+            make_distro("Alpine", false, false),
+        ];
+        // Move selection to index 2.
+        app.list_state.select(Some(2));
+        app.filter_active = true;
+        app.filter_text = "a".to_string();
+
+        app.deactivate_filter();
+        assert_eq!(
+            app.list_state.selected(),
+            Some(0),
+            "deactivate_filter should reset selection to index 0"
+        );
     }
 
     // ── find_distro helper ────────────────────────────────────────────────────
