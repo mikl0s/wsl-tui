@@ -3,11 +3,11 @@
 //! Provides:
 //! - Error types ([`CoreError`])
 //! - Application configuration ([`Config`], [`StorageMode`])
-//!
-//! Future phases will add storage, WSL command execution, and plugin modules.
+//! - Storage backends ([`storage`])
 
 pub mod config;
 pub mod error;
+pub mod storage;
 
 pub use config::{Config, StorageMode};
 pub use error::CoreError;
