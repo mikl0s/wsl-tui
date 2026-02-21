@@ -15,6 +15,7 @@
 //! handling.
 
 mod app;
+pub mod keybindings;
 pub mod theme;
 mod ui;
 

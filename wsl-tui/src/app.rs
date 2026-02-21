@@ -74,6 +74,7 @@ mod tests {
             storage: wsl_core::StorageMode::Auto,
             config_dir: std::path::PathBuf::new(),
             first_run,
+            keybindings: wsl_core::RawKeybindings::default(),
         }
     }
 

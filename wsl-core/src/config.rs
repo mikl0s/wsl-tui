@@ -5,6 +5,121 @@ use serde::Deserialize;
 
 use crate::error::CoreError;
 
+/// Default keybinding values — used by serde `default` attributes.
+fn default_quit() -> String {
+    "q".into()
+}
+fn default_help() -> String {
+    "?".into()
+}
+fn default_filter() -> String {
+    "/".into()
+}
+fn default_up() -> String {
+    "k".into()
+}
+fn default_down() -> String {
+    "j".into()
+}
+fn default_left() -> String {
+    "h".into()
+}
+fn default_right() -> String {
+    "l".into()
+}
+fn default_attach() -> String {
+    "enter".into()
+}
+fn default_start() -> String {
+    "s".into()
+}
+fn default_stop() -> String {
+    "t".into()
+}
+fn default_set_default() -> String {
+    "d".into()
+}
+fn default_remove() -> String {
+    "x".into()
+}
+fn default_export() -> String {
+    "e".into()
+}
+fn default_import_distro() -> String {
+    "i".into()
+}
+
+/// Raw keybinding strings from the `[keybindings]` config section.
+///
+/// Each field is a key string such as `"q"`, `"ctrl+d"`, `"enter"`, or `"f1"`.
+/// Parsed into [`crossterm`] key codes by the TUI's `keybindings` module.
+#[derive(Debug, Clone, Deserialize)]
+pub struct RawKeybindings {
+    /// Key to quit the application. Default: `"q"`.
+    #[serde(default = "default_quit")]
+    pub quit: String,
+    /// Key to open the help overlay. Default: `"?"`.
+    #[serde(default = "default_help")]
+    pub help: String,
+    /// Key to open the distro filter/search bar. Default: `"/"`.
+    #[serde(default = "default_filter")]
+    pub filter: String,
+    /// Key to move selection up. Default: `"k"`.
+    #[serde(default = "default_up")]
+    pub up: String,
+    /// Key to move selection down. Default: `"j"`.
+    #[serde(default = "default_down")]
+    pub down: String,
+    /// Key to move focus left. Default: `"h"`.
+    #[serde(default = "default_left")]
+    pub left: String,
+    /// Key to move focus right. Default: `"l"`.
+    #[serde(default = "default_right")]
+    pub right: String,
+    /// Key to attach a shell to the selected distro. Default: `"enter"`.
+    #[serde(default = "default_attach")]
+    pub attach: String,
+    /// Key to start the selected distro. Default: `"s"`.
+    #[serde(default = "default_start")]
+    pub start: String,
+    /// Key to stop the selected distro. Default: `"t"`.
+    #[serde(default = "default_stop")]
+    pub stop: String,
+    /// Key to set the selected distro as the WSL default. Default: `"d"`.
+    #[serde(default = "default_set_default")]
+    pub set_default: String,
+    /// Key to remove/unregister the selected distro. Default: `"x"`.
+    #[serde(default = "default_remove")]
+    pub remove: String,
+    /// Key to export the selected distro to a `.tar.gz`. Default: `"e"`.
+    #[serde(default = "default_export")]
+    pub export: String,
+    /// Key to import a distro from a `.tar.gz` file. Default: `"i"`.
+    #[serde(default = "default_import_distro")]
+    pub import_distro: String,
+}
+
+impl Default for RawKeybindings {
+    fn default() -> Self {
+        Self {
+            quit: default_quit(),
+            help: default_help(),
+            filter: default_filter(),
+            up: default_up(),
+            down: default_down(),
+            left: default_left(),
+            right: default_right(),
+            attach: default_attach(),
+            start: default_start(),
+            stop: default_stop(),
+            set_default: default_set_default(),
+            remove: default_remove(),
+            export: default_export(),
+            import_distro: default_import_distro(),
+        }
+    }
+}
+
 /// The fully-commented default config that is written to disk on first run.
 ///
 /// Acts as living documentation for all available settings. All options are
@@ -46,10 +161,20 @@ pub const DEFAULT_CONFIG_TOML: &str = r#"# WSL TUI Configuration
 #
 # (Phase 2) Override default keybindings.
 # [keybindings]
-# quit     = "q"
-# help     = "?"
-# up       = "k"
-# down     = "j"
+# quit         = "q"
+# help         = "?"
+# filter       = "/"
+# up           = "k"
+# down         = "j"
+# left         = "h"
+# right        = "l"
+# attach       = "enter"
+# start        = "s"
+# stop         = "t"
+# set_default  = "d"
+# remove       = "x"
+# export       = "e"
+# import_distro = "i"
 "#;
 
 /// Which storage backend the application should use.
@@ -102,6 +227,8 @@ impl FromStr for StorageMode {
 struct RawConfig {
     #[serde(default)]
     storage: StorageMode,
+    #[serde(default)]
+    keybindings: RawKeybindings,
 }
 
 /// Application configuration.
@@ -125,6 +252,12 @@ pub struct Config {
     ///
     /// The TUI uses this flag to decide whether to show the welcome screen.
     pub first_run: bool,
+
+    /// Raw keybinding strings from the `[keybindings]` config section.
+    ///
+    /// The TUI's `keybindings` module parses these strings into crossterm key
+    /// codes at startup via `KeyBindings::from_config`.
+    pub keybindings: RawKeybindings,
 }
 
 impl Default for Config {
@@ -133,6 +266,7 @@ impl Default for Config {
             storage: StorageMode::Auto,
             config_dir: PathBuf::new(),
             first_run: false,
+            keybindings: RawKeybindings::default(),
         }
     }
 }
@@ -169,6 +303,7 @@ impl Config {
             storage: raw.storage,
             config_dir,
             first_run,
+            keybindings: raw.keybindings,
         };
 
         // Environment variable overrides (locked decision — WSL_TUI_* prefix).
@@ -199,6 +334,7 @@ impl Config {
             storage: raw.storage,
             config_dir,
             first_run,
+            keybindings: raw.keybindings,
         };
 
         if let Ok(val) = std::env::var("WSL_TUI_STORAGE") {
@@ -391,5 +527,51 @@ mod tests {
         // The default template must parse without error.
         let result = toml::from_str::<toml::Value>(DEFAULT_CONFIG_TOML);
         assert!(result.is_ok(), "DEFAULT_CONFIG_TOML is not valid TOML: {:?}", result);
+    }
+
+    // ── Keybindings ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn test_config_default_keybindings() {
+        let cfg = Config::default();
+        assert_eq!(cfg.keybindings.quit, "q");
+        assert_eq!(cfg.keybindings.help, "?");
+        assert_eq!(cfg.keybindings.filter, "/");
+        assert_eq!(cfg.keybindings.up, "k");
+        assert_eq!(cfg.keybindings.down, "j");
+        assert_eq!(cfg.keybindings.left, "h");
+        assert_eq!(cfg.keybindings.right, "l");
+        assert_eq!(cfg.keybindings.attach, "enter");
+        assert_eq!(cfg.keybindings.start, "s");
+        assert_eq!(cfg.keybindings.stop, "t");
+        assert_eq!(cfg.keybindings.set_default, "d");
+        assert_eq!(cfg.keybindings.remove, "x");
+        assert_eq!(cfg.keybindings.export, "e");
+        assert_eq!(cfg.keybindings.import_distro, "i");
+    }
+
+    #[test]
+    fn test_config_custom_keybindings_from_toml() {
+        let _guard = env_guard();
+        let tmp = tempfile::tempdir().expect("tempdir created");
+        let config_dir = tmp.path().join("wsl-tui-keybind-test");
+        std::fs::create_dir_all(&config_dir).expect("dir created");
+
+        // Write a TOML that overrides the quit keybinding.
+        std::fs::write(
+            config_dir.join("config.toml"),
+            "[keybindings]\nquit = \"ctrl+q\"\n",
+        )
+        .expect("config written");
+
+        let cfg = Config::load_from(config_dir).expect("config loaded");
+
+        // Overridden key.
+        assert_eq!(cfg.keybindings.quit, "ctrl+q");
+        // Unspecified keys must still have their defaults.
+        assert_eq!(cfg.keybindings.help, "?");
+        assert_eq!(cfg.keybindings.up, "k");
+        assert_eq!(cfg.keybindings.down, "j");
+        assert_eq!(cfg.keybindings.attach, "enter");
     }
 }

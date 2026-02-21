@@ -14,7 +14,7 @@ pub mod plugin;
 pub mod storage;
 pub mod wsl;
 
-pub use config::{Config, StorageMode};
+pub use config::{Config, RawKeybindings, StorageMode};
 pub use error::CoreError;
 pub use plugin::{Plugin, PluginRegistry};
 pub use wsl::{DistroInfo, DistroState, OnlineDistro, WslExecutor};
