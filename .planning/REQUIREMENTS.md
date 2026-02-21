@@ -109,12 +109,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Developer Experience
 
-- [ ] **DX-01**: CLAUDE.md at repo root with coding standards, architecture patterns, and Rust conventions
-- [ ] **DX-02**: Per-crate CLAUDE.md files for wsl-core, wsl-tui, and wsl-web with crate-specific context
+- [x] **DX-01**: CLAUDE.md at repo root with coding standards, architecture patterns, and Rust conventions
+- [x] **DX-02**: Per-crate CLAUDE.md files for wsl-core, wsl-tui, and wsl-web with crate-specific context
 - [x] **DX-03**: `cargo clippy --workspace` passes with zero warnings
 - [x] **DX-04**: `cargo test --workspace` passes all tests
-- [ ] **DX-05**: Startup time under 500ms to first render
-- [ ] **DX-06**: Idle memory usage under 50MB
+- [x] **DX-05**: Startup time under 500ms to first render
+- [x] **DX-06**: Idle memory usage under 50MB
 - [x] **DX-07**: Binary size under 30MB (without WASM runtime)
 
 ## v2 Requirements
@@ -168,12 +168,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-08 | Phase 1 | Complete |
 | FOUND-09 | Phase 1 | Complete |
 | FOUND-10 | Phase 1 | Complete |
-| DX-01 | Phase 1 | Pending |
-| DX-02 | Phase 1 | Pending |
+| DX-01 | Phase 1 | Complete |
+| DX-02 | Phase 1 | Complete |
 | DX-03 | Phase 1 | Complete |
 | DX-04 | Phase 1 | Complete |
-| DX-05 | Phase 1 | Pending |
-| DX-06 | Phase 1 | Pending |
+| DX-05 | Phase 1 | Complete |
+| DX-06 | Phase 1 | Complete |
 | DX-07 | Phase 1 | Complete |
 | DIST-01 | Phase 2 | Pending |
 | DIST-02 | Phase 2 | Pending |

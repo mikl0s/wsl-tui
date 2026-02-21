@@ -12,7 +12,7 @@ Seven phases build the project from a verified Rust scaffold to a fully-featured
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Compilable workspace scaffold with storage, WSL executor, plugin registry, and all Windows platform quirks resolved
+- [x] **Phase 1: Foundation** - Compilable workspace scaffold with storage, WSL executor, plugin registry, and all Windows platform quirks resolved (completed 2026-02-21)
 - [ ] **Phase 2: Core Distro Management TUI** - Full distro lifecycle and shell attach in a polished, Catppuccin-themed TUI with vim navigation
 - [ ] **Phase 3: Provisioning Pack Engine** - Stackable TOML packs with idempotency, dry-run, wizard, and all 9 built-in packs
 - [ ] **Phase 4: Monitoring and Backup** - Real-time resource gauges, historical metrics, and named distro snapshots
@@ -154,7 +154,7 @@ Note: Phases 4 and 5 both depend on Phase 2 (not on each other) and can be paral
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 3/4 | In Progress|  |
+| 1. Foundation | 4/4 | Complete   | 2026-02-21 |
 | 2. Core Distro Management TUI | 0/4 | Not started | - |
 | 3. Provisioning Pack Engine | 0/5 | Not started | - |
 | 4. Monitoring and Backup | 0/3 | Not started | - |
