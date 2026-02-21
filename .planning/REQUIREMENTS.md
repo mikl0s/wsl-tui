@@ -168,6 +168,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-08 | Phase 1 | Pending |
 | FOUND-09 | Phase 1 | Pending |
 | FOUND-10 | Phase 1 | Pending |
+| DX-01 | Phase 1 | Pending |
+| DX-02 | Phase 1 | Pending |
+| DX-03 | Phase 1 | Pending |
+| DX-04 | Phase 1 | Pending |
+| DX-05 | Phase 1 | Pending |
+| DX-06 | Phase 1 | Pending |
+| DX-07 | Phase 1 | Pending |
 | DIST-01 | Phase 2 | Pending |
 | DIST-02 | Phase 2 | Pending |
 | DIST-03 | Phase 2 | Pending |
@@ -178,6 +185,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DIST-08 | Phase 2 | Pending |
 | DIST-09 | Phase 2 | Pending |
 | DIST-10 | Phase 2 | Pending |
+| CONN-01 | Phase 2 | Pending |
 | TUI-01 | Phase 2 | Pending |
 | TUI-07 | Phase 2 | Pending |
 | TUI-08 | Phase 2 | Pending |
@@ -212,7 +220,6 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TUI-03 | Phase 4 | Pending |
 | TUI-04 | Phase 4 | Pending |
 | TUI-05 | Phase 4 | Pending |
-| CONN-01 | Phase 5 | Pending |
 | CONN-02 | Phase 5 | Pending |
 | CONN-03 | Phase 5 | Pending |
 | CONN-04 | Phase 5 | Pending |
@@ -231,19 +238,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WEB-04 | Phase 7 | Pending |
 | WEB-05 | Phase 7 | Pending |
 | WEB-06 | Phase 7 | Pending |
-| DX-01 | Phase 1 | Pending |
-| DX-02 | Phase 1 | Pending |
-| DX-03 | All | Pending |
-| DX-04 | All | Pending |
-| DX-05 | Phase 2 | Pending |
-| DX-06 | Phase 2 | Pending |
-| DX-07 | Phase 2 | Pending |
 
 **Coverage:**
-- v1 requirements: 73 total
-- Mapped to phases: 73
+- v1 requirements: 80 total
+- Mapped to phases: 80
 - Unmapped: 0 ✓
+
+**Phase assignment correction (2026-02-21):**
+- CONN-01 (shell attach) moved from Phase 5 to Phase 2 — shell attach is table stakes for the distro management MVP, not a deferred connectivity feature
+- DX-01 through DX-07 moved from "All phases" annotation to Phase 1 as the establishment phase, with DX-03/DX-04 enforced as invariants across all subsequent phases
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-21 after initial definition*
+*Last updated: 2026-02-21 — traceability updated after roadmap creation*
