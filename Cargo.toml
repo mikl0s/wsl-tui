@@ -1,0 +1,33 @@
+[workspace]
+members = ["wsl-core", "wsl-tui", "wsl-web"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.88"
+authors = ["Mikkel Georgsen"]
+license = "MIT"
+repository = "https://github.com/mikl0s/wsl-tui"
+
+[workspace.dependencies]
+ratatui = "0.30"
+crossterm = { version = "0.29", features = ["event-stream"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+thiserror = "2"
+anyhow = "1"
+dirs = "6"
+encoding_rs = "0.8"
+libsql = { version = "0.9", default-features = false, features = ["core"] }
+futures = "0.3"
+async-trait = "0.1"
+wsl-core = { path = "wsl-core" }
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+strip = true

@@ -1,0 +1,14 @@
+[package]
+name = "wsl-web"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Web UI server for managing WSL2 distributions (stub — Phase 7)"
+
+[dependencies]
+wsl-core = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }

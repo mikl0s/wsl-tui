@@ -1,0 +1,15 @@
+# Windows stack size configuration for libsql
+# libsql's SQL parser (lemon-rs) uses deep recursion that exceeds the Windows
+# default 1MB thread stack. This flag sets the PE executable stack to 8MB.
+# Source: https://github.com/tursodatabase/libsql/issues/1051 (confirmed fix)
+#
+# The project uses the x86_64-pc-windows-gnu toolchain (MinGW-w64/MSYS2) to
+# avoid requiring the Visual Studio MSVC C++ workload to be present in PATH.
+# Ensure C:\msys64\mingw64\bin is in PATH when building.
+
+[target.x86_64-pc-windows-gnu]
+linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
+rustflags = ["-C", "link-arg=-Wl,--stack,8000000"]
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "link-arg=/STACK:8000000"]

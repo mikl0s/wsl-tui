@@ -1,0 +1,17 @@
+[package]
+name = "wsl-tui"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Terminal User Interface for managing WSL2 distributions on Windows 11"
+
+[dependencies]
+wsl-core = { workspace = true }
+ratatui = { workspace = true }
+crossterm = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+futures = { workspace = true }
