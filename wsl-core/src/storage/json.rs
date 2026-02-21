@@ -30,6 +30,7 @@ pub struct JsonData {
 ///
 /// All mutations are written to disk immediately after each [`execute`] call
 /// to preserve durability.
+#[derive(Debug)]
 pub struct JsonBackend {
     file_path: PathBuf,
     data: Arc<Mutex<JsonData>>,
@@ -187,10 +188,8 @@ impl StorageBackend for JsonBackend {
             })?;
             let rows = data.tables.entry(table).or_default();
             rows.push(params);
-            let count = rows.len() as u64;
             self.flush(&data)?;
             // Return 1 — one row inserted.
-            let _ = count;
             Ok(1)
         } else if sql_upper.starts_with("DELETE FROM") {
             let table = parse_delete_table(sql).ok_or_else(|| {
