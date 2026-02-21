@@ -32,13 +32,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A smoke test calls `wsl.exe --list --verbose` and parses the output correctly regardless of whether `WSL_UTF8` is set in the environment
   4. The TUI event loop launches, renders a placeholder frame, and exits cleanly on `q` without leaving the terminal in raw mode after both normal exit and a simulated panic
   5. CLAUDE.md exists at the repo root and in each crate with coding standards and architecture context
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: Cargo workspace scaffold (Cargo.toml resolver v2, all crate stubs, .cargo/config.toml linker flag, MSRV 1.88)
-- [ ] 01-02: Storage backend (StorageBackend trait, libsql impl with Windows stack fix, JSON fallback impl, config.toml loading)
-- [ ] 01-03: WSL executor and plugin registry (UTF-16LE/UTF-8 encoding detection, Plugin trait, PluginRegistry, TUI event loop skeleton with KeyEventKind filter and panic hook)
-- [ ] 01-04: CLAUDE.md living documents (root + wsl-core, wsl-tui, wsl-web crate docs, coding standards)
+- [ ] 01-01-PLAN.md — Cargo workspace scaffold + config system (resolver v2, crate stubs, linker flag, error types, config loading with env overrides)
+- [ ] 01-02-PLAN.md — Storage backend (StorageBackend trait, LibsqlBackend with smoke test, JsonBackend, open_storage factory with auto-fallback)
+- [ ] 01-03-PLAN.md — WSL executor + Plugin registry + TUI skeleton (encoding detection, Plugin trait, PluginRegistry, event loop with KeyEventKind filter, panic hook, welcome screen)
+- [ ] 01-04-PLAN.md — CLAUDE.md living documents (root + wsl-core, wsl-tui, wsl-web crate docs, coding standards)
 
 ### Phase 2: Core Distro Management TUI
 **Goal**: Users can see all their WSL distros, manage their full lifecycle, connect via shell attach, and navigate a polished themed TUI — this is the first shippable version
