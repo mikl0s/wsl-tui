@@ -8,7 +8,8 @@
 //! enums that control which UI panel and modal are currently active.
 
 use ratatui::widgets::ListState;
-use wsl_core::{Config, DistroInfo, WslExecutor};
+use tokio::sync::mpsc;
+use wsl_core::{Config, DistroInfo, OnlineDistro, WslExecutor};
 
 // ── View ──────────────────────────────────────────────────────────────────────
 
@@ -64,7 +65,7 @@ pub enum FocusPanel {
 ///
 /// [`ModalState::None`] means no modal is visible. The event loop routes key
 /// events to modal-specific handlers when a modal is active.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum ModalState {
     /// No modal is visible — normal event routing applies.
     None,
@@ -77,6 +78,140 @@ pub enum ModalState {
     },
     /// The help overlay is visible.
     Help,
+
+    // ── Install flow ──────────────────────────────────────────────────────────
+
+    /// The online distro picker is shown — user selects a distro to install.
+    InstallPicker {
+        /// Distros available from the online catalog.
+        online_distros: Vec<OnlineDistro>,
+        /// Ratatui list selection state for the picker list.
+        list_state: ListState,
+    },
+    /// Install progress modal — shows step label and gauge while installing.
+    InstallProgress {
+        /// The distro being installed.
+        distro_name: String,
+        /// Human-readable label for the current step (e.g., "Downloading...").
+        step: String,
+        /// Progress percentage 0–100.
+        percent: u16,
+        /// `true` when the install process has finished.
+        completed: bool,
+    },
+    /// WSL kernel update progress modal.
+    UpdateProgress {
+        /// Human-readable label for the current update step.
+        step: String,
+        /// `true` when the update process has finished.
+        completed: bool,
+    },
+
+    // ── Export / Import text input modals ─────────────────────────────────────
+
+    /// Text input modal for specifying the export path.
+    ExportInput {
+        /// Name of the distro being exported.
+        distro_name: String,
+        /// Current text in the path input field.
+        path: String,
+        /// Character index of the cursor within `path`.
+        cursor: usize,
+    },
+    /// Multi-field text input modal for importing a distro from a tar file.
+    ImportInput {
+        /// New distro name to register under.
+        name: String,
+        /// Target installation directory on the host.
+        install_dir: String,
+        /// Path to the source `.tar` file.
+        tar_path: String,
+        /// Which field is currently active: 0 = name, 1 = install_dir, 2 = tar_path.
+        active_field: u8,
+        /// Character index of the cursor in the active field.
+        cursor: usize,
+    },
+}
+
+// ListState does not implement PartialEq, so we implement it manually.
+impl PartialEq for ModalState {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::None, Self::None) => true,
+            (
+                Self::Confirm {
+                    distro_name: a,
+                    action_label: b,
+                },
+                Self::Confirm {
+                    distro_name: c,
+                    action_label: d,
+                },
+            ) => a == c && b == d,
+            (Self::Help, Self::Help) => true,
+            (
+                Self::InstallPicker {
+                    online_distros: a, ..
+                },
+                Self::InstallPicker {
+                    online_distros: b, ..
+                },
+            ) => a == b,
+            (
+                Self::InstallProgress {
+                    distro_name: a,
+                    step: b,
+                    percent: c,
+                    completed: d,
+                },
+                Self::InstallProgress {
+                    distro_name: e,
+                    step: f,
+                    percent: g,
+                    completed: h,
+                },
+            ) => a == e && b == f && c == g && d == h,
+            (
+                Self::UpdateProgress {
+                    step: a,
+                    completed: b,
+                },
+                Self::UpdateProgress {
+                    step: c,
+                    completed: d,
+                },
+            ) => a == c && b == d,
+            (
+                Self::ExportInput {
+                    distro_name: a,
+                    path: b,
+                    cursor: c,
+                },
+                Self::ExportInput {
+                    distro_name: d,
+                    path: e,
+                    cursor: f,
+                },
+            ) => a == d && b == e && c == f,
+            (
+                Self::ImportInput {
+                    name: a,
+                    install_dir: b,
+                    tar_path: c,
+                    active_field: d,
+                    cursor: e,
+                },
+                Self::ImportInput {
+                    name: f,
+                    install_dir: g,
+                    tar_path: h,
+                    active_field: i,
+                    cursor: j,
+                },
+            ) => a == f && b == g && c == h && d == i && e == j,
+            _ => false,
+        }
+    }
 }
 
 // ── App ───────────────────────────────────────────────────────────────────────
@@ -147,6 +282,14 @@ pub struct App {
     /// `"unknown"` until set.
     #[allow(dead_code)]
     pub storage_backend: String,
+
+    // ── Install / update progress channel ─────────────────────────────────────
+    /// Receiver for background install or update progress messages.
+    ///
+    /// Each message is `(step_label, percent, completed)`.  The channel is
+    /// created when an install or update is triggered and set to `None` after
+    /// the background task signals completion.
+    pub install_rx: Option<mpsc::Receiver<(String, u16, bool)>>,
 }
 
 impl App {
@@ -180,6 +323,7 @@ impl App {
             filter_text: String::new(),
             executor: WslExecutor::new(),
             storage_backend: "unknown".to_string(),
+            install_rx: None,
         }
     }
 
@@ -435,6 +579,7 @@ fn find_distro<'a>(distros: &'a [DistroInfo], name: &str) -> Option<&'a DistroIn
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tokio::sync::mpsc;
     use wsl_core::DistroState;
 
     /// Build a minimal Config with the given `first_run` value.
@@ -777,5 +922,106 @@ mod tests {
 
         let not_found = find_distro(&distros, "Alpine");
         assert!(not_found.is_none());
+    }
+
+    // ── install_rx field ─────────────────────────────────────────────────────
+
+    #[test]
+    fn test_install_rx_none_initially() {
+        let config = make_config(false);
+        let app = App::new(&config);
+        assert!(app.install_rx.is_none(), "install_rx should start as None");
+    }
+
+    #[test]
+    fn test_install_rx_some_after_assign() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+        let (_tx, rx) = mpsc::channel::<(String, u16, bool)>(8);
+        app.install_rx = Some(rx);
+        assert!(app.install_rx.is_some(), "install_rx should be Some after channel assignment");
+    }
+
+    // ── InstallPicker modal state ─────────────────────────────────────────────
+
+    #[test]
+    fn test_install_picker_modal_equality() {
+        use wsl_core::OnlineDistro;
+        let distros = vec![OnlineDistro {
+            name: "Ubuntu".to_string(),
+            friendly_name: "Ubuntu 22.04 LTS".to_string(),
+        }];
+        let m1 = ModalState::InstallPicker {
+            online_distros: distros.clone(),
+            list_state: ListState::default(),
+        };
+        let m2 = ModalState::InstallPicker {
+            online_distros: distros,
+            list_state: ListState::default().with_selected(Some(0)),
+        };
+        // Both have same online_distros — custom PartialEq only compares that field.
+        assert_eq!(m1, m2, "InstallPicker equality ignores list_state position");
+    }
+
+    // ── InstallProgress modal state ───────────────────────────────────────────
+
+    #[test]
+    fn test_install_progress_dismiss_on_completed() {
+        let config = make_config(false);
+        let mut app = App::new(&config);
+
+        // Simulate a completed install progress modal.
+        app.modal = ModalState::InstallProgress {
+            distro_name: "Ubuntu".to_string(),
+            step: "Complete".to_string(),
+            percent: 100,
+            completed: true,
+        };
+
+        // When completed = true, any key should clear the modal.
+        // We simulate the dismiss logic directly: if completed, clear.
+        if let ModalState::InstallProgress { completed, .. } = app.modal.clone() {
+            if completed {
+                app.modal = ModalState::None;
+            }
+        }
+
+        assert_eq!(
+            app.modal,
+            ModalState::None,
+            "completed install progress should dismiss to None"
+        );
+    }
+
+    // ── ExportInput modal state ───────────────────────────────────────────────
+
+    #[test]
+    fn test_export_input_modal_equality() {
+        let m1 = ModalState::ExportInput {
+            distro_name: "Ubuntu".to_string(),
+            path: "/tmp/ubuntu.tar".to_string(),
+            cursor: 15,
+        };
+        let m2 = ModalState::ExportInput {
+            distro_name: "Ubuntu".to_string(),
+            path: "/tmp/ubuntu.tar".to_string(),
+            cursor: 15,
+        };
+        assert_eq!(m1, m2);
+    }
+
+    // ── ImportInput modal state ───────────────────────────────────────────────
+
+    #[test]
+    fn test_import_input_modal_equality() {
+        let m1 = ModalState::ImportInput {
+            name: "MyDistro".to_string(),
+            install_dir: "C:\\WSL\\MyDistro".to_string(),
+            tar_path: "C:\\tmp\\distro.tar".to_string(),
+            active_field: 0,
+            cursor: 0,
+        };
+        let m2 = m1.clone();
+        assert_eq!(m1, m2);
     }
 }

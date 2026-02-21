@@ -11,11 +11,15 @@
 //! - [`status_bar`] — status bar rendered at the bottom of the dashboard
 //! - [`help_overlay`] — context-aware help overlay (shown on top of dashboard)
 //! - [`confirm_modal`] — y/N confirmation modal for destructive actions
+//! - [`install_modal`] — online distro picker and install/update progress modals
+//! - [`input_modal`] — text input modals for export path and import fields
 //! - [`popup`] — shared popup area helper
 
 pub mod confirm_modal;
 pub mod dashboard;
 pub mod help_overlay;
+pub mod input_modal;
+pub mod install_modal;
 pub mod popup;
 pub mod status_bar;
 pub mod welcome;
@@ -35,7 +39,7 @@ use crate::theme;
 /// Dispatch logic:
 /// - If `app.show_welcome` is `true`, shows the first-run welcome screen.
 /// - Otherwise dispatches to the view-specific renderer based on `app.current_view`.
-/// - After the main view, overlays any active modal on top (help, confirm).
+/// - After the main view, overlays any active modal on top (help, confirm, install, input).
 pub fn render(app: &mut App, frame: &mut Frame) {
     if app.show_welcome {
         welcome::render_welcome(frame);
@@ -47,15 +51,67 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 
         // Render modals on top of the current view.
         // Order: modals are always rendered last so they appear above everything else.
-        match &app.modal.clone() {
+        match app.modal.clone() {
             ModalState::Help => {
                 help_overlay::render_help(app, frame);
             }
             ModalState::Confirm {
-                distro_name,
-                action_label,
+                ref distro_name,
+                ref action_label,
             } => {
                 confirm_modal::render_confirm(frame, distro_name, action_label);
+            }
+            ModalState::InstallPicker {
+                ref online_distros,
+                ref mut list_state,
+            } => {
+                let distros = online_distros.clone();
+                let mut ls = *list_state;
+                install_modal::render_install_picker(app, frame, &distros, &mut ls);
+                // Write back the (possibly scrolled) list_state.
+                if let ModalState::InstallPicker {
+                    ref mut list_state, ..
+                } = app.modal
+                {
+                    *list_state = ls;
+                }
+            }
+            ModalState::InstallProgress {
+                ref distro_name,
+                ref step,
+                percent,
+                completed,
+            } => {
+                install_modal::render_install_progress(frame, distro_name, step, percent, completed);
+            }
+            ModalState::UpdateProgress {
+                ref step,
+                completed,
+            } => {
+                install_modal::render_update_progress(frame, step, completed);
+            }
+            ModalState::ExportInput {
+                ref distro_name,
+                ref path,
+                cursor,
+            } => {
+                input_modal::render_export_input(frame, distro_name, path, cursor);
+            }
+            ModalState::ImportInput {
+                ref name,
+                ref install_dir,
+                ref tar_path,
+                active_field,
+                cursor,
+            } => {
+                input_modal::render_import_input(
+                    frame,
+                    name,
+                    install_dir,
+                    tar_path,
+                    active_field,
+                    cursor,
+                );
             }
             ModalState::None => {}
         }

@@ -9,12 +9,11 @@ use crate::app::View;
 
 /// Every user-initiated operation in the WSL TUI.
 ///
-/// Key events are translated to `Action` variants in `handle_key_event` in
+/// Key events are translated to `Action` variants in `resolve_action` in
 /// `main.rs`. This keeps the event loop thin: input → Action → App mutation.
 ///
-/// Note: Some variants (e.g., `TerminateDistro`, `InstallDistro`, `UpdateWsl`)
-/// are defined for completeness of the Phase 2 action surface but not yet
-/// constructed by the event loop. They will be wired up in Plans 04-05.
+/// Note: Some variants (e.g., `TerminateDistro`) are defined for completeness
+/// of the Phase 2 action surface but not wired as a separate key binding.
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
 pub enum Action {
@@ -73,8 +72,20 @@ pub enum Action {
     /// Close the filter bar and clear the filter (Escape).
     FilterEscape,
 
+    // ── Modal text input ──────────────────────────────────────────────────────
+    /// Insert a character at the cursor position in the active modal input field.
+    ModalInputChar(char),
+    /// Delete the character before the cursor in the active modal input field.
+    ModalInputBackspace,
+    /// Move the cursor left in the active modal input field.
+    ModalInputLeft,
+    /// Move the cursor right in the active modal input field.
+    ModalInputRight,
+    /// Cycle to the next field in a multi-field modal (Tab key).
+    ModalInputTab,
+
     // ── Modal responses ───────────────────────────────────────────────────────
-    /// Confirm a destructive action (e.g., distro removal).
+    /// Confirm a destructive action or submit a modal form (e.g., distro removal, install, export/import).
     ConfirmYes,
     /// Cancel a modal dialog without taking action.
     ConfirmNo,

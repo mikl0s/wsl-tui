@@ -16,3 +16,4 @@ tokio = { workspace = true }
 anyhow = { workspace = true }
 futures = { workspace = true }
 chrono = { workspace = true }
+dirs = { workspace = true }
