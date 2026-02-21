@@ -15,6 +15,7 @@
 //! handling.
 
 mod app;
+pub mod theme;
 mod ui;
 
 use crossterm::event::{Event, KeyCode, KeyEventKind};
