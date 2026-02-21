@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 2 of 7 (Core Distro Management TUI)
-Plan: 2 of 5 in current phase
+Plan: 3 of 5 in current phase
 Status: Phase 2 in progress
-Last activity: 2026-02-21 — Plan 02-02 complete (Catppuccin Mocha theme module and configurable keybindings system)
+Last activity: 2026-02-21 — Plan 02-03 complete (async EventStream event loop, dashboard split-pane, status bar)
 
-Progress: [█████░░░░░] 21%
+Progress: [██████░░░░] 26%
 
 ## Performance Metrics
 
@@ -28,11 +28,11 @@ Progress: [█████░░░░░] 21%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 40 min | 10 min |
-| 02-core-distro-management-tui | 2/5 | 10 min | 5 min |
+| 02-core-distro-management-tui | 3/5 | 16 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (5 min), 01-03 (7 min), 01-04 (4 min), 02-01 (4 min), 02-02 (6 min)
-- Trend: very fast execution; theme constants are mechanical, keybinding system required one test-driven fix (RawKeybindings Default)
+- Last 5 plans: 01-03 (7 min), 01-04 (4 min), 02-01 (4 min), 02-02 (6 min), 02-03 (6 min)
+- Trend: consistent 5-6 min execution; async event loop + dashboard split-pane implemented cleanly
 
 *Updated after each plan completion*
 
@@ -64,6 +64,10 @@ Recent decisions affecting current work:
 - [02-02]: RawKeybindings implements Default manually — #[derive(Default)] yields empty strings; manual impl calls same default_*() functions that serde uses, so Config::default() and TOML deserialization produce identical values
 - [02-02]: KeyBindings::from_config panics at startup on invalid key strings — config validation at startup not runtime; user sees clear message rather than silent no-op
 - [02-02]: parse_key_str returns Option — callers control error handling; from_config uses expect (startup panic); future callers can return errors to user
+- [02-03]: execute_action is async, resolve_action is sync — clean separation; resolve_action is a pure key→Action mapping function with no .await; execute_action has the async context for spawn_blocking
+- [02-03]: Action::None doubles as welcome-screen dismiss sentinel — when show_welcome is true, any key maps to None, execute_action handles None by calling dismiss_welcome()
+- [02-03]: Three overlapping Paragraphs for status bar — Left/Centre/Right alignment over the same Rect; simpler than manual string padding arithmetic
+- [02-03]: chrono::Local::now() called inline in render, not cached in App — no state management needed for a clock
 
 ### Pending Todos
 
@@ -79,5 +83,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 02-02-PLAN.md (Catppuccin Mocha theme module and configurable keybindings system)
-Resume file: .planning/phases/02-core-distro-management-tui/02-02-SUMMARY.md
+Stopped at: Completed 02-03-PLAN.md (async EventStream event loop, dashboard split-pane, status bar)
+Resume file: .planning/phases/02-core-distro-management-tui/02-03-SUMMARY.md

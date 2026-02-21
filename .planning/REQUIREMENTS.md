@@ -74,21 +74,21 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### TUI Interface
 
-- [ ] **TUI-01**: Dashboard view shows distro list, details panel, and resource monitor summary
+- [x] **TUI-01**: Dashboard view shows distro list, details panel, and resource monitor summary
 - [ ] **TUI-02**: Provision view as a modal overlay with pack selection, variable wizard, and execution progress
 - [ ] **TUI-03**: Monitor view with full-screen resource charts and per-distro breakdown
 - [ ] **TUI-04**: Backup view with snapshot manager (create, list, restore)
 - [ ] **TUI-05**: Logs view with scrollable execution history and filtering
 - [ ] **TUI-06**: Settings view with TUI-based config editor
-- [ ] **TUI-07**: Status bar showing active distro, state, storage indicator, and clock
-- [ ] **TUI-08**: Vim-style navigation (h/j/k/l, arrows, Tab for panels)
+- [x] **TUI-07**: Status bar showing active distro, state, storage indicator, and clock
+- [x] **TUI-08**: Vim-style navigation (h/j/k/l, arrows, Tab for panels)
 - [ ] **TUI-09**: Help overlay (`?`) showing context-aware keybindings per active view
 - [ ] **TUI-10**: Fuzzy search/filter (`/`) across distros and packs
 - [ ] **TUI-11**: Command palette (`:`) with fuzzy-matched command list
-- [ ] **TUI-12**: Responsive layout adapting to terminal size with min-width guards
+- [x] **TUI-12**: Responsive layout adapting to terminal size with min-width guards
 - [x] **TUI-13**: Catppuccin Mocha theme applied consistently (per THEME_GUIDELINES.md)
 - [x] **TUI-14**: Keybindings are configurable via `config.toml`
-- [ ] **TUI-15**: Views accessible via number keys (1-5: Dashboard, Provision, Monitor, Backup, Logs)
+- [x] **TUI-15**: Views accessible via number keys (1-5: Dashboard, Provision, Monitor, Backup, Logs)
 
 ### Extensibility
 
@@ -186,15 +186,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DIST-09 | Phase 2 | Complete |
 | DIST-10 | Phase 2 | Complete |
 | CONN-01 | Phase 2 | Pending |
-| TUI-01 | Phase 2 | Pending |
-| TUI-07 | Phase 2 | Pending |
-| TUI-08 | Phase 2 | Pending |
+| TUI-01 | Phase 2 | Complete |
+| TUI-07 | Phase 2 | Complete |
+| TUI-08 | Phase 2 | Complete |
 | TUI-09 | Phase 2 | Pending |
 | TUI-10 | Phase 2 | Pending |
-| TUI-12 | Phase 2 | Pending |
+| TUI-12 | Phase 2 | Complete |
 | TUI-13 | Phase 2 | Complete |
 | TUI-14 | Phase 2 | Complete |
-| TUI-15 | Phase 2 | Pending |
+| TUI-15 | Phase 2 | Complete |
 | PROV-01 | Phase 3 | Pending |
 | PROV-02 | Phase 3 | Pending |
 | PROV-03 | Phase 3 | Pending |
