@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** A user can go from "WSL installed" to "fully provisioned dev environment" in under 5 minutes by selecting packs and hitting go — reproducibly, idempotently, every time.
-**Current focus:** Phase 2 — Core TUI
+**Current focus:** Phase 2 — Core TUI (complete), next: Phase 3 — Provisioning
 
 ## Current Position
 
 Phase: 2 of 7 (Core Distro Management TUI)
-Plan: 4 of 5 in current phase
-Status: Phase 2 in progress
-Last activity: 2026-02-21 — Plan 02-04 complete (help overlay, confirm modal, shell attach, fuzzy filter)
+Plan: 5 of 5 in current phase (PHASE COMPLETE)
+Status: Phase 2 complete, Phase 3 pending
+Last activity: 2026-02-22 — Plan 02-05 complete (install flow, progress modal, export/import modals)
 
-Progress: [███████░░░] 30%
+Progress: [████████░░] 37%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 7 min
-- Total execution time: 0.92 hours
+- Total execution time: 1.05 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 40 min | 10 min |
-| 02-core-distro-management-tui | 4/5 | 21 min | 5 min |
+| 02-core-distro-management-tui | 5/5 | 29 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-04 (4 min), 02-01 (4 min), 02-02 (6 min), 02-03 (6 min), 02-04 (5 min)
-- Trend: consistent 5-6 min execution; TUI interaction model now complete
+- Last 5 plans: 02-01 (4 min), 02-02 (6 min), 02-03 (6 min), 02-04 (5 min), 02-05 (8 min)
+- Trend: consistent 5-8 min execution; Phase 2 complete with all DIST requirements satisfied
 
 *Updated after each plan completion*
 
@@ -72,6 +72,10 @@ Recent decisions affecting current work:
 - [02-04]: popup.rs shared utility — both modals reuse popup_area() rather than duplicating Flex::Center layout code
 - [02-04]: deactivate_filter() resets selection to index 0 — predictable UX when exiting filter mode; no "previous selection" state needed
 - [02-04]: ConfirmYes clones ModalState before clearing — avoids Rust borrow conflict between reading modal fields and writing to app.modal
+- [02-05]: Manual PartialEq for ModalState — ListState is Copy not PartialEq; derive(PartialEq) conflicts with manual impl; removed PartialEq from derive
+- [02-05]: Background install progress via spawn_blocking + mpsc channel — wsl --install is long-running blocking; poll with try_wait() at 500ms, time-estimate progress capped at 90%, jump to 100% on exit
+- [02-05]: std::future::pending() in tokio::select! when install_rx is None — avoids Option<Receiver> complexity while keeping select! branch clean
+- [02-05]: Capital I for InstallDistro — avoids conflict with lowercase i (Import keybinding)
 
 ### Pending Todos
 
@@ -86,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-21
-Stopped at: Completed 02-04-PLAN.md (help overlay, confirm modal, shell attach, fuzzy filter)
-Resume file: .planning/phases/02-core-distro-management-tui/02-04-SUMMARY.md
+Last session: 2026-02-22
+Stopped at: Completed 02-05-PLAN.md (install flow, progress modal, export/import modals) — Phase 2 complete
+Resume file: .planning/phases/02-core-distro-management-tui/02-05-SUMMARY.md

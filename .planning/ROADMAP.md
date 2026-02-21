@@ -13,7 +13,7 @@ Seven phases build the project from a verified Rust scaffold to a fully-featured
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Compilable workspace scaffold with storage, WSL executor, plugin registry, and all Windows platform quirks resolved (completed 2026-02-21)
-- [ ] **Phase 2: Core Distro Management TUI** - Full distro lifecycle and shell attach in a polished, Catppuccin-themed TUI with vim navigation
+- [x] **Phase 2: Core Distro Management TUI** - Full distro lifecycle and shell attach in a polished, Catppuccin-themed TUI with vim navigation (completed 2026-02-22)
 - [ ] **Phase 3: Provisioning Pack Engine** - Stackable TOML packs with idempotency, dry-run, wizard, and all 9 built-in packs
 - [ ] **Phase 4: Monitoring and Backup** - Real-time resource gauges, historical metrics, and named distro snapshots
 - [ ] **Phase 5: Connectivity** - External terminal launch and Termius SSH integration completing the connection mode matrix
@@ -58,7 +58,7 @@ Plans:
 - [x] 02-02-PLAN.md — Catppuccin Mocha theme module + configurable keybindings system
 - [x] 02-03-PLAN.md — Async event loop upgrade + App state expansion + Dashboard split-pane view
 - [x] 02-04-PLAN.md — Help overlay + fuzzy filter + confirmation modal + shell attach
-- [ ] 02-05-PLAN.md — Install flow with progress modal + export/import text input modals
+- [x] 02-05-PLAN.md — Install flow with progress modal + export/import text input modals
 
 ### Phase 3: Provisioning Pack Engine
 **Goal**: Users can go from a bare distro to a fully provisioned dev environment by selecting packs from a wizard, with full visibility into what will change before it happens
@@ -156,7 +156,7 @@ Note: Phases 4 and 5 both depend on Phase 2 (not on each other) and can be paral
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-02-21 |
-| 2. Core Distro Management TUI | 4/5 | In Progress|  |
+| 2. Core Distro Management TUI | 5/5 | Complete   | 2026-02-22 |
 | 3. Provisioning Pack Engine | 0/5 | Not started | - |
 | 4. Monitoring and Backup | 0/3 | Not started | - |
 | 5. Connectivity | 0/2 | Not started | - |
