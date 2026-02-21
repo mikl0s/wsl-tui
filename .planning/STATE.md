@@ -5,33 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** A user can go from "WSL installed" to "fully provisioned dev environment" in under 5 minutes by selecting packs and hitting go — reproducibly, idempotently, every time.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Core TUI
 
 ## Current Position
 
-Phase: 1 of 7 (Foundation)
-Plan: 4 of 4 in current phase
-Status: Phase 1 complete
-Last activity: 2026-02-21 — Plan 01-04 complete (CLAUDE.md living documentation — Phase 1 done)
+Phase: 2 of 7 (Core Distro Management TUI)
+Plan: 1 of 5 in current phase
+Status: Phase 2 in progress
+Last activity: 2026-02-21 — Plan 02-01 complete (DistroInfo types and WslExecutor lifecycle methods)
 
-Progress: [████░░░░░░] 14%
+Progress: [████░░░░░░] 18%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 10 min
-- Total execution time: 0.7 hours
+- Total plans completed: 5
+- Average duration: 9 min
+- Total execution time: 0.75 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 40 min | 10 min |
+| 02-core-distro-management-tui | 1/5 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (24 min), 01-02 (5 min), 01-03 (7 min), 01-04 (4 min)
-- Trend: very fast execution; documentation plan straightforward after reading actual source
+- Last 5 plans: 01-01 (24 min), 01-02 (5 min), 01-03 (7 min), 01-04 (4 min), 02-01 (4 min)
+- Trend: very fast execution; data types + parse functions straightforward with existing executor foundation
 
 *Updated after each plan completion*
 
@@ -57,6 +58,9 @@ Recent decisions affecting current work:
 - [01-03]: #[allow(dead_code)] on App::first_run — field structurally correct, Phase 2 consumer not yet present; suppresses false -D warnings lint
 - [01-03]: Synchronous event::read() for Phase 1 — no background async tasks yet; EventStream + tokio::select! deferred to Phase 2
 - [01-04]: Read actual source before documenting — all CLAUDE.md content verified against real code; aspirational descriptions replaced with actual implementations
+- [02-01]: parse_list_verbose uses whitespace split after stripping * prefix — handles variable column widths reliably across wsl.exe output variations
+- [02-01]: parse_list_online uses splitn(2, 2 spaces) as column separator — matches fixed-width table format from wsl.exe --list --online
+- [02-01]: Executor lifecycle methods are thin 2-line wrappers around self.run() — no extra logic needed; parse functions handle output transformation
 
 ### Pending Todos
 
@@ -72,5 +76,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 01-04-PLAN.md (CLAUDE.md living documentation — Phase 1 complete)
-Resume file: .planning/phases/01-foundation/01-04-SUMMARY.md
+Stopped at: Completed 02-01-PLAN.md (DistroInfo types and WslExecutor lifecycle methods)
+Resume file: .planning/phases/02-core-distro-management-tui/02-01-SUMMARY.md

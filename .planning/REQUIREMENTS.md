@@ -22,16 +22,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Distro Management
 
-- [ ] **DIST-01**: User can see all installed WSL distros with state (Running/Stopped), WSL version, and default indicator
-- [ ] **DIST-02**: User can install a new distro from the available online list with progress feedback
-- [ ] **DIST-03**: User can start a stopped distro
-- [ ] **DIST-04**: User can stop a running distro
-- [ ] **DIST-05**: User can terminate a distro (force stop)
-- [ ] **DIST-06**: User can set a distro as the WSL default
+- [x] **DIST-01**: User can see all installed WSL distros with state (Running/Stopped), WSL version, and default indicator
+- [x] **DIST-02**: User can install a new distro from the available online list with progress feedback
+- [x] **DIST-03**: User can start a stopped distro
+- [x] **DIST-04**: User can stop a running distro
+- [x] **DIST-05**: User can terminate a distro (force stop)
+- [x] **DIST-06**: User can set a distro as the WSL default
 - [ ] **DIST-07**: User can remove (unregister) a distro with a confirmation prompt
-- [ ] **DIST-08**: User can export a distro to a `.tar` file
-- [ ] **DIST-09**: User can import a distro from a `.tar` file
-- [ ] **DIST-10**: User can update the WSL kernel from within the TUI
+- [x] **DIST-08**: User can export a distro to a `.tar` file
+- [x] **DIST-09**: User can import a distro from a `.tar` file
+- [x] **DIST-10**: User can update the WSL kernel from within the TUI
 
 ### Provisioning
 
@@ -175,16 +175,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DX-05 | Phase 1 | Complete |
 | DX-06 | Phase 1 | Complete |
 | DX-07 | Phase 1 | Complete |
-| DIST-01 | Phase 2 | Pending |
-| DIST-02 | Phase 2 | Pending |
-| DIST-03 | Phase 2 | Pending |
-| DIST-04 | Phase 2 | Pending |
-| DIST-05 | Phase 2 | Pending |
-| DIST-06 | Phase 2 | Pending |
+| DIST-01 | Phase 2 | Complete |
+| DIST-02 | Phase 2 | Complete |
+| DIST-03 | Phase 2 | Complete |
+| DIST-04 | Phase 2 | Complete |
+| DIST-05 | Phase 2 | Complete |
+| DIST-06 | Phase 2 | Complete |
 | DIST-07 | Phase 2 | Pending |
-| DIST-08 | Phase 2 | Pending |
-| DIST-09 | Phase 2 | Pending |
-| DIST-10 | Phase 2 | Pending |
+| DIST-08 | Phase 2 | Complete |
+| DIST-09 | Phase 2 | Complete |
+| DIST-10 | Phase 2 | Complete |
 | CONN-01 | Phase 2 | Pending |
 | TUI-01 | Phase 2 | Pending |
 | TUI-07 | Phase 2 | Pending |
