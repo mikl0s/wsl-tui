@@ -86,8 +86,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **TUI-10**: Fuzzy search/filter (`/`) across distros and packs
 - [ ] **TUI-11**: Command palette (`:`) with fuzzy-matched command list
 - [ ] **TUI-12**: Responsive layout adapting to terminal size with min-width guards
-- [ ] **TUI-13**: Catppuccin Mocha theme applied consistently (per THEME_GUIDELINES.md)
-- [ ] **TUI-14**: Keybindings are configurable via `config.toml`
+- [x] **TUI-13**: Catppuccin Mocha theme applied consistently (per THEME_GUIDELINES.md)
+- [x] **TUI-14**: Keybindings are configurable via `config.toml`
 - [ ] **TUI-15**: Views accessible via number keys (1-5: Dashboard, Provision, Monitor, Backup, Logs)
 
 ### Extensibility
@@ -192,8 +192,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TUI-09 | Phase 2 | Pending |
 | TUI-10 | Phase 2 | Pending |
 | TUI-12 | Phase 2 | Pending |
-| TUI-13 | Phase 2 | Pending |
-| TUI-14 | Phase 2 | Pending |
+| TUI-13 | Phase 2 | Complete |
+| TUI-14 | Phase 2 | Complete |
 | TUI-15 | Phase 2 | Pending |
 | PROV-01 | Phase 3 | Pending |
 | PROV-02 | Phase 3 | Pending |

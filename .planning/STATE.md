@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 2 of 7 (Core Distro Management TUI)
-Plan: 1 of 5 in current phase
+Plan: 2 of 5 in current phase
 Status: Phase 2 in progress
-Last activity: 2026-02-21 — Plan 02-01 complete (DistroInfo types and WslExecutor lifecycle methods)
+Last activity: 2026-02-21 — Plan 02-02 complete (Catppuccin Mocha theme module and configurable keybindings system)
 
-Progress: [████░░░░░░] 18%
+Progress: [█████░░░░░] 21%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 9 min
-- Total execution time: 0.75 hours
+- Total plans completed: 6
+- Average duration: 8 min
+- Total execution time: 0.83 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 40 min | 10 min |
-| 02-core-distro-management-tui | 1/5 | 4 min | 4 min |
+| 02-core-distro-management-tui | 2/5 | 10 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (24 min), 01-02 (5 min), 01-03 (7 min), 01-04 (4 min), 02-01 (4 min)
-- Trend: very fast execution; data types + parse functions straightforward with existing executor foundation
+- Last 5 plans: 01-02 (5 min), 01-03 (7 min), 01-04 (4 min), 02-01 (4 min), 02-02 (6 min)
+- Trend: very fast execution; theme constants are mechanical, keybinding system required one test-driven fix (RawKeybindings Default)
 
 *Updated after each plan completion*
 
@@ -61,6 +61,9 @@ Recent decisions affecting current work:
 - [02-01]: parse_list_verbose uses whitespace split after stripping * prefix — handles variable column widths reliably across wsl.exe output variations
 - [02-01]: parse_list_online uses splitn(2, 2 spaces) as column separator — matches fixed-width table format from wsl.exe --list --online
 - [02-01]: Executor lifecycle methods are thin 2-line wrappers around self.run() — no extra logic needed; parse functions handle output transformation
+- [02-02]: RawKeybindings implements Default manually — #[derive(Default)] yields empty strings; manual impl calls same default_*() functions that serde uses, so Config::default() and TOML deserialization produce identical values
+- [02-02]: KeyBindings::from_config panics at startup on invalid key strings — config validation at startup not runtime; user sees clear message rather than silent no-op
+- [02-02]: parse_key_str returns Option — callers control error handling; from_config uses expect (startup panic); future callers can return errors to user
 
 ### Pending Todos
 
@@ -76,5 +79,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 02-01-PLAN.md (DistroInfo types and WslExecutor lifecycle methods)
-Resume file: .planning/phases/02-core-distro-management-tui/02-01-SUMMARY.md
+Stopped at: Completed 02-02-PLAN.md (Catppuccin Mocha theme module and configurable keybindings system)
+Resume file: .planning/phases/02-core-distro-management-tui/02-02-SUMMARY.md
