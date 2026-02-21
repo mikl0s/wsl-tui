@@ -28,7 +28,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DIST-04**: User can stop a running distro
 - [x] **DIST-05**: User can terminate a distro (force stop)
 - [x] **DIST-06**: User can set a distro as the WSL default
-- [ ] **DIST-07**: User can remove (unregister) a distro with a confirmation prompt
+- [x] **DIST-07**: User can remove (unregister) a distro with a confirmation prompt
 - [x] **DIST-08**: User can export a distro to a `.tar` file
 - [x] **DIST-09**: User can import a distro from a `.tar` file
 - [x] **DIST-10**: User can update the WSL kernel from within the TUI
@@ -50,7 +50,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Connection
 
-- [ ] **CONN-01**: User can connect to a distro via shell attach (TUI suspends, drops into shell, restores on exit)
+- [x] **CONN-01**: User can connect to a distro via shell attach (TUI suspends, drops into shell, restores on exit)
 - [ ] **CONN-02**: User can launch a distro in an external terminal (Windows Terminal, Alacritty, WezTerm)
 - [ ] **CONN-03**: External terminal command is configurable with `{distro_name}` template substitution
 - [ ] **CONN-04**: User can launch a distro in Termius with automatic SSH server provisioning
@@ -82,8 +82,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **TUI-06**: Settings view with TUI-based config editor
 - [x] **TUI-07**: Status bar showing active distro, state, storage indicator, and clock
 - [x] **TUI-08**: Vim-style navigation (h/j/k/l, arrows, Tab for panels)
-- [ ] **TUI-09**: Help overlay (`?`) showing context-aware keybindings per active view
-- [ ] **TUI-10**: Fuzzy search/filter (`/`) across distros and packs
+- [x] **TUI-09**: Help overlay (`?`) showing context-aware keybindings per active view
+- [x] **TUI-10**: Fuzzy search/filter (`/`) across distros and packs
 - [ ] **TUI-11**: Command palette (`:`) with fuzzy-matched command list
 - [x] **TUI-12**: Responsive layout adapting to terminal size with min-width guards
 - [x] **TUI-13**: Catppuccin Mocha theme applied consistently (per THEME_GUIDELINES.md)
@@ -181,16 +181,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DIST-04 | Phase 2 | Complete |
 | DIST-05 | Phase 2 | Complete |
 | DIST-06 | Phase 2 | Complete |
-| DIST-07 | Phase 2 | Pending |
+| DIST-07 | Phase 2 | Complete |
 | DIST-08 | Phase 2 | Complete |
 | DIST-09 | Phase 2 | Complete |
 | DIST-10 | Phase 2 | Complete |
-| CONN-01 | Phase 2 | Pending |
+| CONN-01 | Phase 2 | Complete |
 | TUI-01 | Phase 2 | Complete |
 | TUI-07 | Phase 2 | Complete |
 | TUI-08 | Phase 2 | Complete |
-| TUI-09 | Phase 2 | Pending |
-| TUI-10 | Phase 2 | Pending |
+| TUI-09 | Phase 2 | Complete |
+| TUI-10 | Phase 2 | Complete |
 | TUI-12 | Phase 2 | Complete |
 | TUI-13 | Phase 2 | Complete |
 | TUI-14 | Phase 2 | Complete |

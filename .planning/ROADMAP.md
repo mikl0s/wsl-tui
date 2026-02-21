@@ -57,7 +57,7 @@ Plans:
 - [x] 02-01-PLAN.md — DistroInfo types + WslExecutor distro lifecycle methods (TDD)
 - [x] 02-02-PLAN.md — Catppuccin Mocha theme module + configurable keybindings system
 - [x] 02-03-PLAN.md — Async event loop upgrade + App state expansion + Dashboard split-pane view
-- [ ] 02-04-PLAN.md — Help overlay + fuzzy filter + confirmation modal + shell attach
+- [x] 02-04-PLAN.md — Help overlay + fuzzy filter + confirmation modal + shell attach
 - [ ] 02-05-PLAN.md — Install flow with progress modal + export/import text input modals
 
 ### Phase 3: Provisioning Pack Engine
@@ -156,7 +156,7 @@ Note: Phases 4 and 5 both depend on Phase 2 (not on each other) and can be paral
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-02-21 |
-| 2. Core Distro Management TUI | 3/5 | In Progress|  |
+| 2. Core Distro Management TUI | 4/5 | In Progress|  |
 | 3. Provisioning Pack Engine | 0/5 | Not started | - |
 | 4. Monitoring and Backup | 0/3 | Not started | - |
 | 5. Connectivity | 0/2 | Not started | - |

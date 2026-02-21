@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 2 of 7 (Core Distro Management TUI)
-Plan: 3 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: Phase 2 in progress
-Last activity: 2026-02-21 — Plan 02-03 complete (async EventStream event loop, dashboard split-pane, status bar)
+Last activity: 2026-02-21 — Plan 02-04 complete (help overlay, confirm modal, shell attach, fuzzy filter)
 
-Progress: [██████░░░░] 26%
+Progress: [███████░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 8 min
-- Total execution time: 0.83 hours
+- Total plans completed: 7
+- Average duration: 7 min
+- Total execution time: 0.92 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 40 min | 10 min |
-| 02-core-distro-management-tui | 3/5 | 16 min | 5 min |
+| 02-core-distro-management-tui | 4/5 | 21 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (7 min), 01-04 (4 min), 02-01 (4 min), 02-02 (6 min), 02-03 (6 min)
-- Trend: consistent 5-6 min execution; async event loop + dashboard split-pane implemented cleanly
+- Last 5 plans: 01-04 (4 min), 02-01 (4 min), 02-02 (6 min), 02-03 (6 min), 02-04 (5 min)
+- Trend: consistent 5-6 min execution; TUI interaction model now complete
 
 *Updated after each plan completion*
 
@@ -68,6 +68,10 @@ Recent decisions affecting current work:
 - [02-03]: Action::None doubles as welcome-screen dismiss sentinel — when show_welcome is true, any key maps to None, execute_action handles None by calling dismiss_welcome()
 - [02-03]: Three overlapping Paragraphs for status bar — Left/Centre/Right alignment over the same Rect; simpler than manual string padding arithmetic
 - [02-03]: chrono::Local::now() called inline in render, not cached in App — no state management needed for a clock
+- [02-04]: Shell attach lives in run_app (not execute_action) — needs &mut terminal for ratatui::restore/init; AttachShell intercepted before execute_action call
+- [02-04]: popup.rs shared utility — both modals reuse popup_area() rather than duplicating Flex::Center layout code
+- [02-04]: deactivate_filter() resets selection to index 0 — predictable UX when exiting filter mode; no "previous selection" state needed
+- [02-04]: ConfirmYes clones ModalState before clearing — avoids Rust borrow conflict between reading modal fields and writing to app.modal
 
 ### Pending Todos
 
@@ -83,5 +87,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 02-03-PLAN.md (async EventStream event loop, dashboard split-pane, status bar)
-Resume file: .planning/phases/02-core-distro-management-tui/02-03-SUMMARY.md
+Stopped at: Completed 02-04-PLAN.md (help overlay, confirm modal, shell attach, fuzzy filter)
+Resume file: .planning/phases/02-core-distro-management-tui/02-04-SUMMARY.md
