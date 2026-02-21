@@ -154,7 +154,7 @@ Note: Phases 4 and 5 both depend on Phase 2 (not on each other) and can be paral
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 4/4 | Complete   | 2026-02-21 |
+| 1. Foundation | 4/4 | Complete    | 2026-02-21 |
 | 2. Core Distro Management TUI | 0/4 | Not started | - |
 | 3. Provisioning Pack Engine | 0/5 | Not started | - |
 | 4. Monitoring and Backup | 0/3 | Not started | - |
