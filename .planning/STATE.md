@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 1 of 7 (Foundation)
-Plan: 0 of 4 in current phase
-Status: Ready to plan
-Last activity: 2026-02-21 — Roadmap created; 80 v1 requirements mapped across 7 phases
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-21 — Plan 01-01 complete (workspace scaffold + config system)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 4%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 24 min
+- Total execution time: 0.4 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-foundation | 1/4 | 24 min | 24 min |
 
 **Recent Trend:**
-- Last 5 plans: none yet
-- Trend: -
+- Last 5 plans: 01-01 (24 min)
+- Trend: establishing baseline
 
 *Updated after each plan completion*
 
@@ -46,13 +46,17 @@ Recent decisions affecting current work:
 - [Pre-Phase 1]: Embedded PTY (ConPTY) deferred to v2 — requires a spike; Phase 5 covers external terminal and Termius only
 - [Pre-Phase 1]: Rust 1.88 MSRV set by sysinfo 0.37.2; Rust 2024 edition required by ratatui 0.30
 - [Pre-Phase 1]: libsql Windows stack overflow requires `/STACK:8000000` linker flag in .cargo/config.toml — must be Phase 1 day one
+- [01-01]: GNU toolchain (x86_64-pc-windows-gnu) chosen over MSVC — MSVC C++ workload not in PATH on this machine; MinGW-w64 GCC from MSYS2 resolves link.exe ambiguity; MSVC target config preserved for future
+- [01-01]: Config::load_from(PathBuf) test helper added — avoids touching ~/.wsl-tui/ in tests while keeping production API clean
+- [01-01]: ENV_LOCK mutex required for ALL Config::load_from tests — Rust test process shares env vars; any load_from test is affected by WSL_TUI_* leakage from other tests
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
+- [Phase 1 ongoing]: MSVC C++ workload not installed on dev machine — GNU toolchain in use; building with MSVC requires installing Desktop development with C++ in VS Build Tools and adding to PATH
 - [Phase 3]: Pack idempotency step state schema is an open design question — research-phase recommended during Phase 3 planning
 - [Phase 5]: ConPTY + Ratatui embedded terminal has sparse Rust documentation — if PTY is re-scoped into v1, a spike is required before design commitment (currently deferred to v2)
 - [Phase 6]: mlua sandbox design (safe stdlib subsets, UserData exposure) has limited authoritative documentation — research-phase recommended during Phase 6 planning
@@ -60,5 +64,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-foundation/01-CONTEXT.md
+Stopped at: Completed 01-01-PLAN.md (workspace scaffold + config system)
+Resume file: .planning/phases/01-foundation/01-01-SUMMARY.md
