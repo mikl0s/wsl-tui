@@ -13,11 +13,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **FOUND-02**: libsql embedded storage works on Windows with stack overflow workaround
 - [x] **FOUND-03**: JSON fallback storage activates transparently when libsql fails
 - [x] **FOUND-04**: Storage backend is configurable via `config.toml` (`auto` | `libsql` | `json`)
-- [ ] **FOUND-05**: WSL command execution handles both UTF-16LE and UTF-8 output encoding
-- [ ] **FOUND-06**: Plugin trait and registry system supports compile-time plugin registration
+- [x] **FOUND-05**: WSL command execution handles both UTF-16LE and UTF-8 output encoding
+- [x] **FOUND-06**: Plugin trait and registry system supports compile-time plugin registration
 - [x] **FOUND-07**: Configuration loaded from `~/.wsl-tui/config.toml` with sensible defaults
-- [ ] **FOUND-08**: TUI event loop filters `KeyEventKind::Press` only (Windows crossterm fix)
-- [ ] **FOUND-09**: Panic hook restores terminal on crash via `ratatui::init()`/`ratatui::restore()`
+- [x] **FOUND-08**: TUI event loop filters `KeyEventKind::Press` only (Windows crossterm fix)
+- [x] **FOUND-09**: Panic hook restores terminal on crash via `ratatui::init()`/`ratatui::restore()`
 - [x] **FOUND-10**: Workspace uses `resolver = "2"` to prevent feature unification issues
 
 ### Distro Management
@@ -162,11 +162,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
-| FOUND-05 | Phase 1 | Pending |
-| FOUND-06 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Complete |
+| FOUND-06 | Phase 1 | Complete |
 | FOUND-07 | Phase 1 | Complete |
-| FOUND-08 | Phase 1 | Pending |
-| FOUND-09 | Phase 1 | Pending |
+| FOUND-08 | Phase 1 | Complete |
+| FOUND-09 | Phase 1 | Complete |
 | FOUND-10 | Phase 1 | Complete |
 | DX-01 | Phase 1 | Pending |
 | DX-02 | Phase 1 | Pending |
