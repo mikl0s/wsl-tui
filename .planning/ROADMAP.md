@@ -51,13 +51,14 @@ Plans:
   4. User can export a distro to a `.tar` file and import a `.tar` as a new distro from within the TUI
   5. User presses `Enter` (or configured key) on a running distro and drops into a shell; closing the shell returns them to the TUI with layout restored
   6. Pressing `?` shows context-aware help, `/` opens fuzzy filter, number keys 1-5 switch views, and all actions work via vim-style hjkl navigation
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 02-01: wsl-plugin-distro (list with encoding-safe parsing, install with progress stream, start/stop/terminate/set-default/remove)
-- [ ] 02-02: Export/import .tar, WSL kernel update, shell attach (TUI suspend + wsl.exe + restore)
-- [ ] 02-03: Dashboard view, status bar, Catppuccin Mocha theme, responsive layout, vim navigation
-- [ ] 02-04: Help overlay, fuzzy filter, number-key view switching, configurable keybindings
+- [ ] 02-01-PLAN.md — DistroInfo types + WslExecutor distro lifecycle methods (TDD)
+- [ ] 02-02-PLAN.md — Catppuccin Mocha theme module + configurable keybindings system
+- [ ] 02-03-PLAN.md — Async event loop upgrade + App state expansion + Dashboard split-pane view
+- [ ] 02-04-PLAN.md — Help overlay + fuzzy filter + confirmation modal + shell attach
+- [ ] 02-05-PLAN.md — Install flow with progress modal + export/import text input modals
 
 ### Phase 3: Provisioning Pack Engine
 **Goal**: Users can go from a bare distro to a fully provisioned dev environment by selecting packs from a wizard, with full visibility into what will change before it happens
@@ -155,7 +156,7 @@ Note: Phases 4 and 5 both depend on Phase 2 (not on each other) and can be paral
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-02-21 |
-| 2. Core Distro Management TUI | 0/4 | Not started | - |
+| 2. Core Distro Management TUI | 0/5 | Not started | - |
 | 3. Provisioning Pack Engine | 0/5 | Not started | - |
 | 4. Monitoring and Backup | 0/3 | Not started | - |
 | 5. Connectivity | 0/2 | Not started | - |
