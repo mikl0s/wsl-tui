@@ -35,8 +35,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Cargo workspace scaffold + config system (resolver v2, crate stubs, linker flag, error types, config loading with env overrides)
-- [ ] 01-02-PLAN.md — Storage backend (StorageBackend trait, LibsqlBackend with smoke test, JsonBackend, open_storage factory with auto-fallback)
+- [x] 01-01-PLAN.md — Cargo workspace scaffold + config system (resolver v2, crate stubs, linker flag, error types, config loading with env overrides)
+- [x] 01-02-PLAN.md — Storage backend (StorageBackend trait, LibsqlBackend with smoke test, JsonBackend, open_storage factory with auto-fallback)
 - [ ] 01-03-PLAN.md — WSL executor + Plugin registry + TUI skeleton (encoding detection, Plugin trait, PluginRegistry, event loop with KeyEventKind filter, panic hook, welcome screen)
 - [ ] 01-04-PLAN.md — CLAUDE.md living documents (root + wsl-core, wsl-tui, wsl-web crate docs, coding standards)
 
@@ -154,7 +154,7 @@ Note: Phases 4 and 5 both depend on Phase 2 (not on each other) and can be paral
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/4 | Not started | - |
+| 1. Foundation | 2/4 | In progress | - |
 | 2. Core Distro Management TUI | 0/4 | Not started | - |
 | 3. Provisioning Pack Engine | 0/5 | Not started | - |
 | 4. Monitoring and Backup | 0/3 | Not started | - |

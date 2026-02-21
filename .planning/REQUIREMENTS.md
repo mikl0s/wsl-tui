@@ -10,8 +10,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Foundation
 
 - [x] **FOUND-01**: Cargo workspace compiles with all crate scaffolding and zero warnings
-- [ ] **FOUND-02**: libsql embedded storage works on Windows with stack overflow workaround
-- [ ] **FOUND-03**: JSON fallback storage activates transparently when libsql fails
+- [x] **FOUND-02**: libsql embedded storage works on Windows with stack overflow workaround
+- [x] **FOUND-03**: JSON fallback storage activates transparently when libsql fails
 - [x] **FOUND-04**: Storage backend is configurable via `config.toml` (`auto` | `libsql` | `json`)
 - [ ] **FOUND-05**: WSL command execution handles both UTF-16LE and UTF-8 output encoding
 - [ ] **FOUND-06**: Plugin trait and registry system supports compile-time plugin registration
@@ -112,7 +112,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **DX-01**: CLAUDE.md at repo root with coding standards, architecture patterns, and Rust conventions
 - [ ] **DX-02**: Per-crate CLAUDE.md files for wsl-core, wsl-tui, and wsl-web with crate-specific context
 - [x] **DX-03**: `cargo clippy --workspace` passes with zero warnings
-- [ ] **DX-04**: `cargo test --workspace` passes all tests
+- [x] **DX-04**: `cargo test --workspace` passes all tests
 - [ ] **DX-05**: Startup time under 500ms to first render
 - [ ] **DX-06**: Idle memory usage under 50MB
 - [x] **DX-07**: Binary size under 30MB (without WASM runtime)
@@ -159,8 +159,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Complete |
-| FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Complete |
+| FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
 | FOUND-05 | Phase 1 | Pending |
 | FOUND-06 | Phase 1 | Pending |
@@ -171,7 +171,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DX-01 | Phase 1 | Pending |
 | DX-02 | Phase 1 | Pending |
 | DX-03 | Phase 1 | Complete |
-| DX-04 | Phase 1 | Pending |
+| DX-04 | Phase 1 | Complete |
 | DX-05 | Phase 1 | Pending |
 | DX-06 | Phase 1 | Pending |
 | DX-07 | Phase 1 | Complete |

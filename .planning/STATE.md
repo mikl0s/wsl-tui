@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 1 of 7 (Foundation)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-21 — Plan 01-01 complete (workspace scaffold + config system)
+Last activity: 2026-02-21 — Plan 01-02 complete (storage backend system)
 
-Progress: [█░░░░░░░░░] 4%
+Progress: [██░░░░░░░░] 7%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 24 min
-- Total execution time: 0.4 hours
+- Total plans completed: 2
+- Average duration: 14 min
+- Total execution time: 0.5 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 1/4 | 24 min | 24 min |
+| 01-foundation | 2/4 | 29 min | 14 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (24 min)
-- Trend: establishing baseline
+- Last 5 plans: 01-01 (24 min), 01-02 (5 min)
+- Trend: storage plan was fast (pre-scaffolded by linter)
 
 *Updated after each plan completion*
 
@@ -49,6 +49,9 @@ Recent decisions affecting current work:
 - [01-01]: GNU toolchain (x86_64-pc-windows-gnu) chosen over MSVC — MSVC C++ workload not in PATH on this machine; MinGW-w64 GCC from MSYS2 resolves link.exe ambiguity; MSVC target config preserved for future
 - [01-01]: Config::load_from(PathBuf) test helper added — avoids touching ~/.wsl-tui/ in tests while keeping production API clean
 - [01-01]: ENV_LOCK mutex required for ALL Config::load_from tests — Rust test process shares env vars; any load_from test is affected by WSL_TUI_* leakage from other tests
+- [01-02]: StorageValue/StorageRow instead of libsql types in trait — keeps StorageBackend backend-independent; both backends implement without coupling to libsql
+- [01-02]: open_storage factory swallows libsql error in Auto mode — transparent fallback per locked decision; calling code never knows if JSON was used
+- [01-02]: migration_available detection-only in Phase 1 — flag set when libsql active AND data.json exists; actual migration deferred to Phase 2 migration prompt UI
 
 ### Pending Todos
 
@@ -64,5 +67,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 01-01-PLAN.md (workspace scaffold + config system)
-Resume file: .planning/phases/01-foundation/01-01-SUMMARY.md
+Stopped at: Completed 01-02-PLAN.md (storage backend system)
+Resume file: .planning/phases/01-foundation/01-02-SUMMARY.md
