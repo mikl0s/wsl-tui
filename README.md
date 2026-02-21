@@ -15,7 +15,7 @@
 [![Rust](https://img.shields.io/badge/rust-stable-fab387?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Windows 11](https://img.shields.io/badge/windows%2011-89b4fa?style=for-the-badge&logo=windows11&logoColor=white)](https://www.microsoft.com/windows)
 [![Ratatui](https://img.shields.io/badge/ratatui-0.30+-a6e3a1?style=for-the-badge)](https://ratatui.rs/)
-[![Stars](https://img.shields.io/github/stars/mikkelens/wsl-tui?style=for-the-badge&color=f9e2af&logo=github)](https://github.com/mikkelens/wsl-tui/stargazers)
+[![Stars](https://img.shields.io/github/stars/mikl0s/wsl-tui?style=for-the-badge&color=f9e2af&logo=github)](https://github.com/mikl0s/wsl-tui/stargazers)
 
 **Manage. Provision. Monitor. Connect.**
 <br>
@@ -408,7 +408,7 @@ Contributions are welcome! This project is MIT licensed and open to all.
 
 ```bash
 # Clone
-git clone https://github.com/mikkelens/wsl-tui.git
+git clone https://github.com/mikl0s/wsl-tui.git
 cd wsl-tui
 
 # Build
